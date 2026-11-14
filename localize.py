@@ -73,26 +73,28 @@ with zipfile.ZipFile(io.BytesIO(base64.b64decode((ROOT / "radio-vi.zip.b64").rea
     radio.extractall("assets/sfx/voix_vi")
 replace("src/05a-sfx.js", "'voix_' + (LANG === 'fr' ? 'fr' : 'en')", "'voix_vi'")
 replace("shell.html", 'data-go="news"', 'data-go="news" style="display:none"')
-replace("src/09-game.js", "function startMatch(opt = {}) {", """const azoneCalls = {
-  'AZONE HÀ J': 'ha', 'AZONE MINH CẬN': 'can', 'AZONE MINH CON': 'con',
-  'AZONE TÙNG CẤU': 'tung', 'AZONE GIANG': 'giang', 'AZONE VUI': 'vui', 'AZONE MY': 'my'
-};
-let azoneMatch = 0;
-async function announceSquad(round) {
-  if (MATCH.online || MATCH.mode === 'ffa' || Settings.voice === false || !AU.ctx) return;
-  const names = entities.filter(e => !e.isPlayer && !e.off && e.team === PL.ent.team)
-    .map(e => azoneCalls[e.name]).filter(Boolean);
-  if (!names.length || !await sfxLoad('voix_vi')) return;
-  const voice = Math.floor(Math.random() * 2);
-  for (const line of [...names, 'cheer']) {
-    if (round !== azoneMatch || MATCH.state !== 'playing' || Settings.voice === false) return;
-    const id = 'v_' + line;
-    const bank = SFX.bank.get(id);
-    if (!bank || !bank.length) continue;
-    const out = sfxPlay(id, uiOut(1), AU.ctx.currentTime, { e: bank[voice] || bank[0] });
-    if (out) await new Promise(resolve => { out.s.onended = resolve; });
-  }
+with zipfile.ZipFile(io.BytesIO(base64.b64decode((ROOT / "texas-voices.zip.b64").read_bytes()))) as clips:
+    clips.extractall("dist/texas-voices")
+
+replace("src/09y-decompte.js", "function cdGo(late) {", """const texasVoice = new Audio();
+texasVoice.preload = 'auto';
+texasVoice.src = 'texas-voices/go.mp3';
+let nextTexasBark = 0, lastTexasBark = 0;
+function playTexasVoice(file) {
+  if (Settings.voice === false || !Settings.volume) return;
+  texasVoice.volume = Math.min(1, Settings.volume);
+  texasVoice.src = 'texas-voices/' + file + '.mp3';
+  texasVoice.play().catch(() => {});
 }
-function startMatch(opt = {}) {
-  azoneMatch++;""")
-replace("src/09-game.js", "  spawnEntity(PL.ent);", "  spawnEntity(PL.ent);\n  void announceSquad(azoneMatch);")
+function texasCombatBark() {
+  if (!CD.done || MATCH.state !== 'playing' || MATCH.time < nextTexasBark || !texasVoice.paused) return;
+  const pick = (lastTexasBark + 1 + Math.floor(Math.random() * (lastTexasBark ? 10 : 11)) - 1) % 11 + 1;
+  lastTexasBark = pick;
+  nextTexasBark = MATCH.time + 8 + Math.random() * 6;
+  playTexasVoice('bark-' + String(pick).padStart(2, '0'));
+}
+function cdGo(late) {""")
+replace("src/09y-decompte.js", "sfxAnnounce(null, 'st_start');", "nextTexasBark = MATCH.time + 3; playTexasVoice('go');")
+replace("src/09y-decompte.js", "go.textContent = _t('En avant !')", "go.textContent = 'GO GO GO'")
+replace("src/09y-decompte.js", "function cdClear() {", "function cdClear() {\\n  texasVoice.pause();")
+replace("src/09-game.js", "if (victim.protT > 0) return;", "if (victim.protT > 0) return;\\n  if (attacker && attacker !== victim && (attacker === PL.ent || victim === PL.ent)) texasCombatBark();")
