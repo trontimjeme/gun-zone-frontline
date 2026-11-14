@@ -61,3 +61,5 @@ size = Image.open("assets/menu-bg.webp").size
 ImageOps.fit(im, size).save("assets/menu-bg.webp", quality=88)
 Image.new("L", Image.open("assets/menu-depth.webp").size, 128).save("assets/menu-depth.webp")
 replace("shell.html", '"inLanguage": ["fr", "en"]', '"inLanguage": "vi"')
+
+replace("shell.html", '<footer class="mfoot">', '<footer class="mfoot" style="display:none">')
