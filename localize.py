@@ -96,5 +96,5 @@ function texasCombatBark() {
 function cdGo(late) {""")
 replace("src/09y-decompte.js", "sfxAnnounce(null, 'st_start');", "nextTexasBark = MATCH.time + 3; playTexasVoice('go');")
 replace("src/09y-decompte.js", "go.textContent = _t('En avant !')", "go.textContent = 'GO GO GO'")
-replace("src/09y-decompte.js", "function cdClear() {", "function cdClear() {\\n  texasVoice.pause();")
-replace("src/09-game.js", "if (victim.protT > 0) return;", "if (victim.protT > 0) return;\\n  if (attacker && attacker !== victim && (attacker === PL.ent || victim === PL.ent)) texasCombatBark();")
+replace("src/09y-decompte.js", "function cdClear() {", "function cdClear() {\n  texasVoice.pause();")
+replace("src/09-game.js", "if (victim.protT > 0) return;", "if (victim.protT > 0) return;\n  if (attacker && attacker !== victim && (attacker === PL.ent || victim === PL.ent)) texasCombatBark();")
