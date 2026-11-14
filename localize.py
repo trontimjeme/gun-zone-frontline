@@ -63,3 +63,36 @@ Image.new("L", Image.open("assets/menu-depth.webp").size, 128).save("assets/menu
 replace("shell.html", '"inLanguage": ["fr", "en"]', '"inLanguage": "vi"')
 
 replace("shell.html", '<footer class="mfoot">', '<footer class="mfoot" style="display:none">')
+
+import base64
+import io
+import zipfile
+
+Path("assets/logo.webp").write_bytes(base64.b64decode((ROOT / "menu-logo.webp.b64").read_bytes()))
+with zipfile.ZipFile(io.BytesIO(base64.b64decode((ROOT / "radio-vi.zip.b64").read_bytes()))) as radio:
+    radio.extractall("assets/sfx/voix_vi")
+replace("src/05a-sfx.js", "'voix_' + (LANG === 'fr' ? 'fr' : 'en')", "'voix_vi'")
+replace("shell.html", 'data-go="news"', 'data-go="news" style="display:none"')
+replace("src/09-game.js", "function startMatch(opt = {}) {", """const azoneCalls = {
+  'AZONE HÀ J': 'ha', 'AZONE MINH CẬN': 'can', 'AZONE MINH CON': 'con',
+  'AZONE TÙNG CẤU': 'tung', 'AZONE GIANG': 'giang', 'AZONE VUI': 'vui', 'AZONE MY': 'my'
+};
+let azoneMatch = 0;
+async function announceSquad(round) {
+  if (MATCH.online || MATCH.mode === 'ffa' || Settings.voice === false || !AU.ctx) return;
+  const names = entities.filter(e => !e.isPlayer && !e.off && e.team === PL.ent.team)
+    .map(e => azoneCalls[e.name]).filter(Boolean);
+  if (!names.length || !await sfxLoad('voix_vi')) return;
+  const voice = Math.floor(Math.random() * 2);
+  for (const line of [...names, 'cheer']) {
+    if (round !== azoneMatch || MATCH.state !== 'playing' || Settings.voice === false) return;
+    const id = 'v_' + line;
+    const bank = SFX.bank.get(id);
+    if (!bank || !bank.length) continue;
+    const out = sfxPlay(id, uiOut(1), AU.ctx.currentTime, { e: bank[voice] || bank[0] });
+    if (out) await new Promise(resolve => { out.s.onended = resolve; });
+  }
+}
+function startMatch(opt = {}) {
+  azoneMatch++;""")
+replace("src/09-game.js", "  spawnEntity(PL.ent);", "  spawnEntity(PL.ent);\n  void announceSquad(azoneMatch);")
