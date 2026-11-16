@@ -82,3 +82,41 @@ edit_source("09d-netrelay.js", "function netrUrl() {", "function netrUrl() {\n  
 edit_source("09j-compte.js", "function acctGate(code) {", "function acctGate(code) {\n  if (wifiTeam) return true;")
 edit_source("09c-net.js", "function netLink() { return", "function netLink() { if (wifiTeam) return location.origin + location.pathname + '?wifi=1'; return")
 edit_source("09c-net.js", "function netAutoJoin() {", "function netAutoJoin() {\n  if (new URLSearchParams(location.search).get('wifi') === '1') { uiGo('multi'); wifiConnect(); return; }")
+
+# Sample the existing AZONE chest emblem from the project logo.
+badge = logo.crop((3, 3, 39, 39)).resize((24, 24)).convert("RGB")
+badge_rows = ["".join("1" if sum(px) > 350 else "0" for px in [badge.getpixel((x,y)) for x in range(24)]) for y in range(24)]
+edit_source("06ga-tenues.js", "const SKIN_REL =", """function azoneTeamSkin(skin, team) {
+  if (skin === 'azoneVarsity') skin = 'assault';
+  return team === 0 && skin === 'assault' ? 'azoneVarsity' : skin;
+}
+SKINS.azoneVarsity = {
+  ...SKINS.assault, name: 'AZONE Varsity', parts: { ...SKINS.assault.parts, patch: false },
+  art(g, w, h) {
+    g.fillStyle = '#173e34'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#eee4c7';
+    for (const y of [.02,.055,.91,.945]) g.fillRect(0,y*h,w,.012*h);
+    g.fillStyle = '#112c26'; g.fillRect(.243*w,0,.014*w,h);
+    g.fillStyle = '#ddc896';
+    for(let i=1;i<=6;i++){g.beginPath();g.arc(w*.25,h*i/7,2,0,Math.PI*2);g.fill();}
+    g.textAlign='center'; g.fillStyle='#f1dfac';
+    const badge = """ + repr(badge_rows) + """;
+    badge.forEach((row,y) => { for (let x=0;x<24;x++) if(row[x]==='1') g.fillRect(w*.322+x*.85,h*.32+y*1.3,1,1.5); });
+    g.font='bold 30px sans-serif'; g.fillText('AZONE', w*.75, h*.39,w*.27);
+  }
+};
+const SKIN_REL =""")
+edit_source("06ga-tenues.js", "(e === PL.ent ? skinMine() : skinId(e.skin))", "azoneTeamSkin(e === PL.ent ? skinMine() : skinId(e.skin), e.team)")
+edit_source("06g-body.js", "soldierVest(B, skin, hi); mark('gilet');", "if (skin !== 'azoneVarsity') soldierVest(B, skin, hi); mark('gilet');")
+edit_source("06g-body.js", "0.0, { bump: (a, k)", "0.0, { ...(skin === 'azoneVarsity' ? { uv: (u, y) => atlasUV('art', u, 1 - (y - 1) / .485) } : {}), bump: (a, k)")
+edit_source("06g-body.js", "uv: (u, v) => atlasUV('camo', 0.45 + u * 0.52, (v + 0.1) / 0.7)", """...(skin === 'azoneVarsity' ? {
+        uv: () => GEAR_TILE.fab, col: (a,k,p,s) => new THREE.Color(s.v > .475 ? '#214b3b' : '#e9dfc7')
+      } : {uv: (u, v) => atlasUV('camo', 0.45 + u * 0.52, (v + 0.1) / 0.7)})""")
+edit_source("07-bots.js","makeSoldier(b.skin, team","makeSoldier(azoneTeamSkin(b.skin, team), team")
+edit_source("07-bots.js","soldierLook(b.model, b.skin,","soldierLook(b.model, azoneTeamSkin(b.skin, b.team),")
+edit_source("09c-net.js","makeSoldier(e.skin, skinRel(e)","makeSoldier(azoneTeamSkin(e.skin, e.team), skinRel(e)")
+edit_source("09c-net.js","soldierLook(e.model, sk, skinRel(e))","soldierLook(e.model, azoneTeamSkin(sk, team), skinRel(e))")
+edit_source("06e-gear.js","  g.drawImage(cam, 0, 0);","  if (fp && skin === 'azoneVarsity') { const cloth = cam.getContext('2d'); cloth.fillStyle = '#e9dfc7'; cloth.fillRect(0,0,768,768); }\n  g.drawImage(cam, 0, 0);")
+edit_source("06f-hands.js","const mine = skinMine();","const mine = azoneTeamSkin(skinMine(), PL.ent && PL.ent.team);")
+edit_source("09u-tenues.js","vmSetLook(s, 0);","vmSetLook(azoneTeamSkin(s, PL.ent && PL.ent.team), 0);")
+edit_source("09u-tenues.js","vmSetLook(m, 0);","vmSetLook(azoneTeamSkin(m, PL.ent && PL.ent.team), 0);")
