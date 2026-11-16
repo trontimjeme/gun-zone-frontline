@@ -301,3 +301,22 @@ replace("src/09b-killcam.js", "function kcAbort() {", "function kcAbort() {\n  k
 replace("src/05-audio.js", "lim.connect(ctx.destination);", "lim.connect(ctx.destination); AU.videoOutput = lim;")
 replace("src/09-game.js", "kcReset(); MATCH.finalPending = null;", "kcVideoReset(); kcReset(); MATCH.finalPending = null;")
 replace("src/09-game.js", "  $('end').classList.add('show');", "  kcVideos.mvp = MATCH.mode === 'ffa' ? ffaList().sort(ffaCmp)[0] : [0,1].flatMap(boardList).sort(boardCmp)[0]; kcVideoLinks();\n  $('end').classList.add('show');")
+
+# Keep the results open until the player explicitly leaves.
+def end_edit(file, pattern, replacement):
+    p = Path(file)
+    value, count = re.subn(pattern, lambda _: replacement, p.read_text())
+    if count != 1:
+        raise ValueError("Unexpected results-screen source: " + pattern)
+    p.write_text(value)
+
+end_edit("src/09-game.js", r"function updateEnd\(dt\) \{[\s\S]*?\n\}", "")
+end_edit("src/09-game.js", r"  END\.t = END_SECONDS;[^\n]*", "")
+end_edit("src/09-game.js", r"    updateEnd\(dt\);[^\n]*", "")
+end_edit("src/09-game.js", r"  \$\('againBtn'\)\.textContent =[^\n]*", "  $('againBtn').textContent = 'EXIT';")
+end_edit("src/09-game.js", r"  \$\('menuBtn'\)\.classList\.toggle\('hidden', !!MATCH.online\);", "  $('menuBtn').classList.remove('hidden'); $('menuBtn').textContent = 'Quay về màn hình chính';")
+end_edit("src/09e-menus.js", r"\$\('againBtn'\)\.addEventListener\('click', \(\) => \{[\s\S]*?\n  \}\);", "$('againBtn').addEventListener('click', () => toMenu());")
+replace("src/09e-menus.js", "$('menuBtn').addEventListener('click', () => toMenu());", "$('menuBtn').addEventListener('click', () => toMenu('main'));")
+end_edit("shell.html", r'<div class="end-time">[\s\S]*?</i></i></div>', '')
+replace("src/09c-net.js", "if (wasPlaying && MATCH.state !== 'menu' &&", "if (wasPlaying && MATCH.state !== 'ended' && MATCH.state !== 'menu' &&")
+replace("src/09c-net.js", "case 'start': netStartOnline(m); break;", "case 'start': if (MATCH.state === 'ended') netSend({t:'leave'}); else netStartOnline(m); break;")
