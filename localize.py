@@ -257,3 +257,19 @@ replace("src/01-core.js","  if (Settings.aimAssist !== 'off')","""  if (!Setting
   }
   if (Settings.aimAssist !== 'off')""")
 replace("src/09c-net.js","time: 10, map: 'sable'","time: 10, map: 'italy'")
+
+# Public link metadata identifies the Gun ZONE edition.
+page=Path("shell.html")
+html=page.read_text()
+html=re.sub(r'<meta (name="description"|property="og:description") content="[^"]*">',r'<meta \1 content="AZONE STUDIO">',html)
+html=html.replace('<meta name="application-name"', '<meta name="author" content="AZONE STUDIO">\n<meta name="twitter:title" content="Gun ZONE">\n<meta name="twitter:description" content="AZONE STUDIO">\n<meta name="application-name"')
+schema={"@context":"https://schema.org","@type":"WebSite","name":"Gun ZONE","url":"__SITE__/","author":{"@type":"Organization","name":"AZONE STUDIO"}}
+html=re.sub(r'(<script type="application/ld\+json">).*?(</script>)',lambda m:m[1]+json.dumps(schema)+m[2],html,flags=re.S)
+html=re.sub(r'<button [^>]*id="srcBtn"[^>]*>.*?</button>', '',html)
+html=re.sub(r'<span class="credit">[^<]*</span>','<span class="credit">AZONE STUDIO</span>',html)
+page.write_text(html)
+menus=Path("src/09e-menus.js")
+menus.write_text("".join(line for line in menus.read_text().splitlines(True) if "$('srcBtn').addEventListener(" not in line))
+# Deliver the menu markup to the running game; keep the initial share document concise.
+with Path("build.py").open("a") as handle:
+    handle.write("\nfrom pathlib import Path\nfrom html.parser import HTMLParser\ngame_path=Path(\"dist/riposte-frontline.html\")\ngame_html=game_path.read_text()\nbody_match=re.search(r'<body\\b[^>]*>',game_html,re.I)\nstart=body_match.end()\nend=game_html.lower().index(\"</body>\",start)\nbody=game_html[start:end]\nchunks=re.split(r'(<script\\b[^>]*>[\\s\\S]*?</script\\s*>)',body,flags=re.I)\nfor i in range(0,len(chunks),2):\n    markup=chunks[i]\n    if not markup.strip():continue\n    payload=\"document.write(\"+json.dumps(markup,ensure_ascii=True)+\");\"\n    filename=\"ui-\"+hashlib.sha256(payload.encode()).hexdigest()[:16]+\".js\"\n    Path(\"dist\",filename).write_text(payload)\n    chunks[i]='<script src=\"'+filename+'\"></script>'\ngame_path.write_text(game_html[:start]+'<noscript>Gun ZONE · AZONE STUDIO</noscript>'+''.join(chunks)+game_html[end:])\n")
