@@ -70,3 +70,15 @@ hud_style = """<style>
 </style>"""
 shell = Path("shell.html")
 shell.write_text(shell.read_text().replace("</head>", hud_style + "</head>", 1))
+
+edit_source("09c-net.js", "const NET_PAGES = {", "let wifiTeam = '', wifiBusy = false;\nasync function wifiConnect() {\n  if (wifiBusy || NET.role !== 'off') return;\n  if (!netLib()) { netStatus('Hãy tải lại trang để kết nối WIFI TEAM.'); return; }\n  wifiBusy = true;\n  netStatus('Đang tìm đội trên Wi-Fi hiện tại…');\n  try {\n    const response = await fetch('/api/wifi-team', {cache:'no-store', signal:AbortSignal.timeout(10000)});\n    if (!response.ok) throw Error();\n    const {team} = await response.json();\n    if (!/^[a-f0-9]{32}$/.test(team)) throw Error();\n    if (NET.role !== 'off' || UI.screen !== 'multi') return;\n    wifiTeam = team;\n    netHost({code:'WTEAM', pub:false});\n  } catch { wifiTeam = ''; netStatus('Chưa kết nối được WIFI TEAM. Kiểm tra Internet rồi thử lại.'); }\n  finally { wifiBusy = false; }\n}\nconst NET_PAGES = {")
+edit_source("09c-net.js", "    if (!acctOnlineOk()) { // le multijoueur demande un compte", "    rows.push({k:'btn',key:'wifi-team',label:'WIFI TEAM · Kết nối LAN',sub:'Chọn cùng Wi-Fi trên thiết bị rồi bấm để tự tạo hoặc vào phòng.',run:wifiConnect,disabled:!netLib()});\n    if (!acctOnlineOk()) { // le multijoueur demande un compte")
+edit_source("09c-net.js", "function netPeerOpts() { return", "function netPeerOpts() { if (wifiTeam) return {debug:0, config:{iceServers:[]}}; return")
+edit_source("09c-net.js", "new Peer(NET_PREFIX + code,", "new Peer((wifiTeam ? 'gunzone-wifi-' + wifiTeam : NET_PREFIX) + code,")
+edit_source("09c-net.js", "peer.connect(NET_PREFIX + code,", "peer.connect((wifiTeam ? 'gunzone-wifi-' + wifiTeam : NET_PREFIX) + code,")
+edit_source("09c-net.js", "const t = err && err.type;", "const t = err && err.type;\n  if (wifiTeam && t === 'unavailable-id' && NET.role === 'host' && !NET.joined) {\n    const team = wifiTeam; netReset(); wifiTeam = team; netJoinLobby('WTEAM'); return;\n  }")
+edit_source("09c-net.js", "function netReset(msg) {", "function netReset(msg) {\n  wifiTeam = '';")
+edit_source("09d-netrelay.js", "function netrUrl() {", "function netrUrl() {\n  if (wifiTeam) return '';")
+edit_source("09j-compte.js", "function acctGate(code) {", "function acctGate(code) {\n  if (wifiTeam) return true;")
+edit_source("09c-net.js", "function netLink() { return", "function netLink() { if (wifiTeam) return location.origin + location.pathname + '?wifi=1'; return")
+edit_source("09c-net.js", "function netAutoJoin() {", "function netAutoJoin() {\n  if (new URLSearchParams(location.search).get('wifi') === '1') { uiGo('multi'); wifiConnect(); return; }")
