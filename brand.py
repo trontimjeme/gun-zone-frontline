@@ -140,3 +140,9 @@ edit_source("08c-pickups.js", "  removeDrop(d);\n  // l'arme rangée", "  if (d.
 edit_source("08c-pickups.js", "function clearDrops() {", "function clearDrops() { DROP.synced = false;")
 edit_source("08c-pickups.js", "function updateDrops(dt) {", "function updateDrops(dt) {\n  if (NET.on && NET.role === 'client' && !DROP.synced) { DROP.synced = true; netSend({t:'listGuns'}); }")
 edit_source("09c-net.js", "    case 'takeGun':", "    case 'listGuns':\n      if (NET.on && pl.ig) for (const d of DROP.list) if (d.netDrop) {\n        const p = d.obj.position;\n        netSendTo(pl,{t:'deathGun',id:d.netDrop,w:d.def.id,g:d.def.key,mag:d.mag,reserve:d.reserve,x:p.x,y:p.y,z:p.z,age:d.age});\n      }\n      break;\n    case 'takeGun':")
+
+edit_source("08a-binds.js", "const bindDefault = (a) => BIND_DEFS.find((d) => d[0] === a)[1];", "const bindDefault = (a) => a === 'crouch' ? 'ControlRight' : a === 'use' ? 'End' : BIND_DEFS.find((d) => d[0] === a)[1];\nconst padKeys = Array.from({length:10}, (_,i) => 'Numpad' + i);")
+edit_source("08a-binds.js", "function keyCanon(code) { if", "function keyCanon(code) {\n  if (!BIND.rev.has(code)) {\n    if (code === 'Numpad0') return 'KeyR';\n    if (/^Numpad[1-9]$/.test(code)) code = 'Digit' + code.slice(-1);\n  }\n  if")
+edit_source("08a-binds.js", "...BIND_DEFS.map((d) => bindOf(d[0])),", "...BIND_DEFS.map((d) => bindOf(d[0])), ...padKeys,")
+edit_source("08a-binds.js", " : keyLabel(bindOf(a));", " : [keyLabel(bindOf(a)), ...padKeys.filter(k => k !== bindOf(a) && keyCanon(k) === BIND_DEFS.find(d => d[0] === a)[1]).map(k => 'Num ' + k.slice(-1))].join(' / ');")
+edit_source("08-player.js", "if (['Space', 'ArrowUp', 'ArrowDown'].includes(c))", "if (e.code === 'End' || /^Numpad[0-9]$/.test(e.code) || ['Space', 'ArrowUp', 'ArrowDown'].includes(c))")
