@@ -1,0 +1,21 @@
+{
+  "version": "0.1.0",
+  "stage": "motion blockout",
+  "height_m": 1.92,
+  "clips": {
+    "Idle": 2,
+    "Walk": 1,
+    "Run": 0.7,
+    "Crouch": 2,
+    "Jump": 1,
+    "KnifeSlash": 0.55,
+    "RifleIdle": 2,
+    "RifleWalk": 1,
+    "Fire": 0.3,
+    "Reload": 1.8
+  },
+  "bones": 18,
+  "vertices": 7460,
+  "triangles": 14388,
+  "note": "Rigid segment skinning; cloth/fingers not simulated. Original procedural prototype, not final concept fidelity."
+}
