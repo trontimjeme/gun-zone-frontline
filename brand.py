@@ -62,3 +62,11 @@ edit_source("09e-menus.js", "const SOLO_PAGES = {", """function soloNameRow() {
 const SOLO_PAGES = {""")
 edit_source("09e-menus.js", "if (netInLobby()) rows.push({ k: 'note', text: SRV.on", "if (!ACCT.user) rows.unshift(soloNameRow());\n    if (netInLobby()) rows.push({ k: 'note', text: SRV.on")
 edit_source("09-game.js", "for (let i = 0; i < 5; i++) makeBot", "PL.ent.name = NET.nick || _t('Vous');\n    for (let i = 0; i < 5; i++) makeBot")
+
+# Shared in-match HUD for desktop and touch.
+hud_style = """<style>
+#killfeed,body.touch #killfeed{left:auto;right:max(12px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));align-items:flex-end;pointer-events:none}
+#hitmarker.head::after{content:'💀';position:absolute;left:0;top:0;transform:translate(-50%,-50%);font:30vmin/1 'Segoe UI Emoji','Apple Color Emoji',sans-serif;filter:grayscale(1) brightness(1.65);opacity:.29;pointer-events:none}
+</style>"""
+shell = Path("shell.html")
+shell.write_text(shell.read_text().replace("</head>", hud_style + "</head>", 1))
