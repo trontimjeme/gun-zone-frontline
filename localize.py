@@ -239,3 +239,21 @@ replace("shell.html",'grid-template-areas: "w w" "p p" "g n"', 'grid-template-ar
 replace("shell.html","#wname { grid-area:", "#weaponDetail {grid-area:detail;color:#e4dbc8;font-size:clamp(10px,1.2vw,14px);text-shadow:0 1px 3px #201b14} #wname { grid-area:")
 replace("src/09-game.js","HUD.lastAmmo = ammo;", """HUD.lastAmmo = ammo;
     $('weaponDetail').textContent = italyRpg.on ? 'Hủy diệt · Vũ khí phóng tên lửa' : kn ? 'Dao · Cận chiến' : (texasWeaponHints[d.cat] || d.type);""")
+
+# Italy uses the existing panorama for the visible sky. Soften its solar hotspot before filtering reflections.
+replace("src/01-core.js","const d = loader.parse(buf.buffer);","""const d = loader.parse(buf.buffer);
+    if (name === 'golden_gate_hills' && d.type === THREE.HalfFloatType) {
+      const ceiling = THREE.DataUtils.toHalfFloat(4);
+      for (let i=0;i<d.data.length;i++) if (d.data[i] < 0x8000 && d.data[i] > ceiling) d.data[i]=ceiling;
+    }""")
+replace("src/02yz-italy.js","sunI:1.1","sunI:0.82")
+replace("src/02yz-italy.js","gain:1.1","gain:0.96")
+replace("src/02yz-italy.js","exp:1},rays:[1,0.96,0.88]","exp:0.93},bloom:[0.08,0.3,1.4],raysThr:3,raysCap:0.18,rays:[0.40,0.38,0.35]")
+replace("src/02yz-italy.js","mat.addEventListener('dispose',()=>tex.dispose());","mat.envMapIntensity=0.55; csmMaterial(mat); mat.addEventListener('dispose',()=>{if(csm)csm.shaders.delete(mat);tex.dispose();});")
+replace("src/02yz-italy.js","mesh.receiveShadow=true;mapAdd(mesh);","mesh.receiveShadow=true;mesh.castShadow=true;mapAdd(mesh);")
+replace("src/01-core.js","map: 'sable', volume:","map: 'italy', volume:")
+replace("src/01-core.js","  if (Settings.aimAssist !== 'off')","""  if (!Settings.italyDefaultApplied) {
+    Settings.map = 'italy'; Settings.italyDefaultApplied = true; saveSettings();
+  }
+  if (Settings.aimAssist !== 'off')""")
+replace("src/09c-net.js","time: 10, map: 'sable'","time: 10, map: 'italy'")
