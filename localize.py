@@ -276,3 +276,10 @@ with Path("build.py").open("a") as handle:
 
 # Other map assets stay available in the project, outside the playable catalogue.
 replace("src/02-map.js", "];\nconst mapById", "].filter(m => m.id === 'simoun');\nconst mapById")
+
+replace("src/08-player.js", "function onKey(e, down) {", "function jumpHeld() { return !!(KEYS.Space || KEYS.Enter || KEYS.NumpadEnter || KEYS.MiddleJump); }\nfunction onKey(e, down) {\n  if (e.code === 'Enter' || e.code === 'NumpadEnter') {\n    if (!down) KEYS[e.code] = false;\n    if (MATCH.state === 'playing' && PL.ent.alive && pointerActive() && !CHAT.open && !KS.map.open && !e.defaultPrevented && !e.target?.closest?.('input,textarea,button,[contenteditable=true]')) {\n      e.preventDefault(); KEYS[e.code] = down; return;\n    }\n  }")
+replace("src/08-player.js", "  if (e.button === 0) { if (trackpadOn())", "  if (e.button === 1 && PL.ent.alive) { e.preventDefault(); KEYS.MiddleJump = true; return; }\n  if (e.button === 0) { if (trackpadOn())")
+replace("src/08-player.js", "addEventListener('mouseup', (e) => {", "addEventListener('mouseup', (e) => { if (e.button === 1) KEYS.MiddleJump = false;")
+replace("src/08-player.js", "if (KEYS.Space && e.crouch", "if (jumpHeld() && e.crouch")
+replace("src/08-player.js", "I.jump = !!KEYS.Space", "I.jump = jumpHeld()")
+replace("src/08g-mecha-pilote.js", "P.jump = !!KEYS.Space", "P.jump = jumpHeld()")
