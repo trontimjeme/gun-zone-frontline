@@ -283,3 +283,13 @@ replace("src/08-player.js", "addEventListener('mouseup', (e) => {", "addEventLis
 replace("src/08-player.js", "if (KEYS.Space && e.crouch", "if (jumpHeld() && e.crouch")
 replace("src/08-player.js", "I.jump = !!KEYS.Space", "I.jump = jumpHeld()")
 replace("src/08g-mecha-pilote.js", "P.jump = !!KEYS.Space", "P.jump = jumpHeld()")
+
+# Each physical Shift keeps its own held state in KEYS.
+replace("src/08-player.js", "function onKey(e, down) {", """function sprintHeld() {
+  return !!(KEYS.ShiftLeft || (KEYS.ShiftRight && !BIND.rev.has('ShiftRight')));
+}
+function onKey(e, down) {""")
+replace("src/08-player.js", "(KEYS.ShiftLeft || TOUCH.sprint", "(sprintHeld() || TOUCH.sprint")
+replace("src/08-player.js", "TOUCH.sprint : !!KEYS.ShiftLeft", "TOUCH.sprint : sprintHeld()")
+replace("src/08-player.js", "(KEYS.ShiftLeft || PAD.l3)", "(sprintHeld() || PAD.l3)")
+replace("src/08a-binds.js", "'ShiftLeft', 'ControlLeft']; }", "'ShiftLeft', 'ShiftRight', 'ControlLeft']; }")
