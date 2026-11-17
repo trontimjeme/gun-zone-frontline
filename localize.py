@@ -410,3 +410,41 @@ replace('src/08e-fpv.js', "function fpvLeave() {", "function fpvLeave() {\n  if(
 replace('src/08h-azone-tactical.js', "e.azDroneUsed=false;", "e.azDroneUsed=!!fpvOf(e);")
 replace('src/08h-azone-tactical.js', "if(e.azDroneUsed){hudMsg", "const existing=fpvOf(e);if(existing){PILOT.d=existing;PILOT.yaw=PL.yaw;PILOT.pitch=PL.pitch;PL.yaw=existing.yaw;PL.pitch=existing.pitch;existing.mesh.visible=false;PL.held=PL.queued=false;$('hud').classList.add('fpv');fpvHudText();return;}\n  if(e.azDroneUsed){hudMsg")
 replace('src/08h-azone-tactical.js', "AZONE • KHOANG LÁI FPV", "AZONE • FPV • BẤT TỬ • PIN ∞")
+
+# Minimal FPV telemetry and return along the recorded flight path.
+replace('src/08e-fpv.js','  d.snd = fpvSoundStart(d);','  d.home=pos.clone(); d.trail=[pos.clone()]; d.returning=false;\n  d.snd = fpvSoundStart(d);')
+replace('src/08e-fpv.js','function fpvStep(d, dt) {','function fpvStep(d, dt) {\n  if(d.returning && !d.boom && d.owner.alive){azDroneReturnStep(d,dt);return;}\n  azDroneTrail(d);')
+replace('src/08h-azone-tactical.js',"if(PILOT.d && c==='KeyB')", "if(PILOT.d && c==='KeyH'){azDroneReturn();return true;}\n  if(PILOT.d && c==='KeyB')")
+replace('src/08h-azone-tactical.js',"PILOT.d.ai=!PILOT.d.ai;", "PILOT.d.returning=false;PILOT.d.ai=!PILOT.d.ai;")
+replace('src/08h-azone-tactical.js',"['B · TỰ ĐỘNG / BAY TAY',()=>{if(PILOT.d)azTacticalKey('KeyB');}]", "['BAY VỀ CHỖ CŨ',()=>azDroneReturn()]")
+replace('src/08h-azone-tactical.js',"const el=document.createElement('div');el.style", "const el=document.createElement('div');el.className='az-drone-panel';el.style")
+replace('src/08h-azone-tactical.js',"btn.addEventListener('pointerdown'", "btn.addEventListener('mousedown',ev=>ev.stopPropagation());btn.addEventListener('pointerdown'")
+p=Path('src/08h-azone-tactical.js');s=p.read_text();start=s.index('AZTACT.label.textContent=d?');end=s.index(": '8 · Mìn nổ '",start)
+s=s[:start]+"AZTACT.label.textContent=d?'Tốc độ '+d.vel.length().toFixed(1)+' m/s · Tọa độ '+d.pos.x.toFixed(1)+', '+d.pos.y.toFixed(1)+', '+d.pos.z.toFixed(1)"+s[end:]
+s+='''
+function azDroneTrail(d){
+  if(!d.local || d.returning)return;
+  const a=d.trail,last=a[a.length-1];if(last.distanceToSquared(d.pos)<.000001)return;
+  if(a.length>1){const prev=a[a.length-2],u=last.clone().sub(prev),v=d.pos.clone().sub(last);if(u.lengthSq()>0&&v.lengthSq()>0&&u.normalize().dot(v.normalize())>.999999){last.copy(d.pos);return;}}
+  a.push(d.pos.clone());
+}
+function azDroneReturn(){
+  const d=PILOT.d;if(!d || d.dead)return;
+  azDroneTrail(d);d.returning=true;d.ai=false;d.vel.set(0,0,0);PL.held=PL.queued=false;
+}
+function azDroneReturnStep(d,dt){
+  let travel=Math.min(dt,.1)*8;
+  while(travel>0 && d.trail.length){
+    const goal=d.trail[d.trail.length-1],delta=goal.clone().sub(d.pos),dist=delta.length();
+    if(dist<.001){d.trail.pop();continue;}
+    const step=Math.min(travel,dist),direction=delta.multiplyScalar(1/dist),to=d.pos.clone().addScaledVector(direction,step);
+    if(fpvHit(d,d.pos,to)){d.vel.set(0,0,0);fpvPose(d);return;}
+    d.pos.copy(to);d.vel.copy(direction).multiplyScalar(8);travel-=step;
+    if(step===dist)d.trail.pop();
+  }
+  if(!d.trail.length){d.returning=false;d.vel.set(0,0,0);d.in.fw=d.in.st=d.in.up=0;d.trail=[d.home.clone()];if(PILOT.d===d)fpvLeave();}
+  fpvPose(d);
+}
+'''
+p.write_text(s)
+p=Path('shell.html');s=p.read_text();s=s.replace('</style>', '#hud.fpv > :not(.az-drone-panel):not(#smokeFx):not(#iemFx){display:none!important}\n#hud.fpv .az-drone-panel{bottom:6%!important;background:rgba(12,20,25,.45)!important}\n</style>',1);p.write_text(s)
