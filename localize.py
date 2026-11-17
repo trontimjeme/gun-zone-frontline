@@ -392,3 +392,21 @@ replace('src/08e-fpv.js', "  if (fpvOf(owner)) return;", "  if (fpvOf(owner)) re
 replace('src/08a-binds.js', 'const BIND_DEFS = [', "const BIND_DEFS = [\n  ['azmine','Digit8','Chọn mìn / đổi mìn khói'], ['azdrone','Digit9','Drone trưởng team'], ['azauto','KeyB','Drone: tự động / bay tay'],")
 replace('src/08-player.js','PL.nades = C.nades;', 'PL.nades = 0;')
 replace('src/07-bots.js','e.nades = NADE_COUNT;', 'e.nades = 0;')
+
+
+# Drone rules: invulnerable, unlimited flight, explicit detonation only.
+replace('src/08e-fpv.js', "if(d.local && d.owner===PL.ent && (!d.owner.alive || !azCaptain(d.owner))){fpvEnd(d,false);return;}", "if(!d.owner.alive){d.ai=false;d.vel.set(0,0,0);d.in.fw=d.in.st=d.in.up=0;return;}")
+replace('src/08e-fpv.js', "if(d.ai && d.tgt && d.pos.distanceTo(entChest(d.tgt,new V3()))<1.5 && lineClear(d.pos,entChest(d.tgt,new V3())))d.boom=true;", "")
+replace('src/08e-fpv.js', "if (d.boom || d.t >= FPV.life || !d.owner.alive && !d.ai) { fpvEnd(d, d.owner.alive || d.boom); return; }", "if (d.boom) { fpvEnd(d, true); return; }")
+replace('src/08e-fpv.js', "if (vn > FPV.crash) { d.pos.copy(to); fpvEnd(d, true); return; }", "// Hard impacts slide/stop; never detonate.")
+replace('src/08e-fpv.js', "if (h === FPV_BOOM) { d.pos.copy(to); fpvEnd(d, true); return; }", "if (h === FPV_BOOM) { d.vel.set(0,0,0); return; }")
+replace('src/08e-fpv.js', "function fpvDamage(d, dmg, shooter) {", "function fpvDamage(d, dmg, shooter) { return;")
+replace('src/08e-fpv.js', "function fpvNetHit(owner, dmg) {", "function fpvNetHit(owner, dmg) { return;")
+replace('src/08e-fpv.js', "function fpvBotsShoot(dt) {", "function fpvBotsShoot(dt) { return;")
+replace('src/08e-fpv.js', "function fpvEnd(d, boom, send = d.local) {", "function fpvEnd(d, boom, send = d.local) {\n  if(!boom || (d.local && !d.boom))return;")
+replace('src/08e-fpv.js', "const d = PILOT.d, left = clamp(1 - d.t / FPV.life, 0, 1);", "const d = PILOT.d, left = 1;")
+replace('src/08e-fpv.js', "if (!Array.isArray(a) || a.length < 5 || !e.alive) return;", "if (!Array.isArray(a) || a.length < 5) return;")
+replace('src/08e-fpv.js', "function fpvLeave() {", "function fpvLeave() {\n  if(PILOT.d){PILOT.d.mesh.visible=true;PILOT.d.ai=false;PILOT.d.vel.set(0,0,0);PILOT.d.in.fw=PILOT.d.in.st=PILOT.d.in.up=0;}")
+replace('src/08h-azone-tactical.js', "e.azDroneUsed=false;", "e.azDroneUsed=!!fpvOf(e);")
+replace('src/08h-azone-tactical.js', "if(e.azDroneUsed){hudMsg", "const existing=fpvOf(e);if(existing){PILOT.d=existing;PILOT.yaw=PL.yaw;PILOT.pitch=PL.pitch;PL.yaw=existing.yaw;PL.pitch=existing.pitch;existing.mesh.visible=false;PL.held=PL.queued=false;$('hud').classList.add('fpv');fpvHudText();return;}\n  if(e.azDroneUsed){hudMsg")
+replace('src/08h-azone-tactical.js', "AZONE • KHOANG LÁI FPV", "AZONE • FPV • BẤT TỬ • PIN ∞")
