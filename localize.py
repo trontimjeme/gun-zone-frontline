@@ -252,7 +252,7 @@ replace("src/02yz-italy.js","exp:1},rays:[1,0.96,0.88]","exp:0.93},bloom:[0.08,0
 replace("src/02yz-italy.js","mat.addEventListener('dispose',()=>tex.dispose());","mat.envMapIntensity=0.55; csmMaterial(mat); mat.addEventListener('dispose',()=>{if(csm)csm.shaders.delete(mat);tex.dispose();});")
 replace("src/02yz-italy.js","mesh.receiveShadow=true;mapAdd(mesh);","mesh.receiveShadow=true;mesh.castShadow=true;mapAdd(mesh);")
 replace("src/01-core.js","map: 'sable', volume:","map: 'italy', volume:")
-replace("src/01-core.js","  if (Settings.aimAssist !== 'off')","""  if (!Settings.italyDefaultApplied || !['italy', 'simoun'].includes(Settings.map)) {
+replace("src/01-core.js","  if (Settings.aimAssist !== 'off')","""  if (!Settings.italyDefaultApplied || Settings.map !== 'italy') {
     Settings.map = 'italy'; Settings.italyDefaultApplied = true; saveSettings();
   }
   if (Settings.aimAssist !== 'off')""")
@@ -274,8 +274,8 @@ menus.write_text("".join(line for line in menus.read_text().splitlines(True) if 
 with Path("build.py").open("a") as handle:
     handle.write("\nfrom pathlib import Path\nfrom html.parser import HTMLParser\ngame_path=Path(\"dist/riposte-frontline.html\")\ngame_html=game_path.read_text()\nbody_match=re.search(r'<body\\b[^>]*>',game_html,re.I)\nstart=body_match.end()\nend=game_html.lower().index(\"</body>\",start)\nbody=game_html[start:end]\nchunks=re.split(r'(<script\\b[^>]*>[\\s\\S]*?</script\\s*>)',body,flags=re.I)\nfor i in range(0,len(chunks),2):\n    markup=chunks[i]\n    if not markup.strip():continue\n    payload=\"document.write(\"+json.dumps(markup,ensure_ascii=True)+\");\"\n    filename=\"ui-\"+hashlib.sha256(payload.encode()).hexdigest()[:16]+\".js\"\n    Path(\"dist\",filename).write_text(payload)\n    chunks[i]='<script src=\"'+filename+'\"></script>'\ngame_path.write_text(game_html[:start]+'<noscript>Gun ZONE · AZONE STUDIO</noscript>'+''.join(chunks)+game_html[end:])\n")
 
-# Other map assets stay available in the project, outside the playable catalogue.
-replace("src/02-map.js", "];\nconst mapById", "].filter(m => m.id === 'simoun');\nconst mapById")
+# Italy is registered by 02yz-italy.js; no upstream map remains playable.
+replace("src/02-map.js", "];\nconst mapById", "].filter(() => false);\nconst mapById")
 
 replace("src/08-player.js", "function onKey(e, down) {", "function jumpHeld() { return !!(KEYS.Space || KEYS.Enter || KEYS.NumpadEnter || KEYS.MiddleJump); }\nfunction onKey(e, down) {\n  if (e.code === 'Enter' || e.code === 'NumpadEnter') {\n    if (!down) KEYS[e.code] = false;\n    if (MATCH.state === 'playing' && PL.ent.alive && pointerActive() && !CHAT.open && !KS.map.open && !e.defaultPrevented && !e.target?.closest?.('input,textarea,button,[contenteditable=true]')) {\n      e.preventDefault(); KEYS[e.code] = down; return;\n    }\n  }")
 replace("src/08-player.js", "  if (e.button === 0) { if (trackpadOn())", "  if (e.button === 1 && PL.ent.alive) { e.preventDefault(); KEYS.MiddleJump = true; return; }\n  if (e.button === 0) { if (trackpadOn())")
