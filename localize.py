@@ -333,6 +333,5 @@ replace("src/06ga-tenues.js", "const SKIN_REL =", "\nSKINS.chibi = { ...SKINS.as
 replace("src/06g-body.js", "function soldierGeometry(skin, lod) {", "function soldierGeometry(skin, lod) {\n  if (skin === 'chibi') return chibiGeometry();")
 replace("src/06e-gear.js", "function gearMaterial(skin, mode) {", "function gearMaterial(skin, mode) {\n  if (skin === 'chibi' && mode !== 'fp') return chibiMaterial(mode);")
 
-# Keep the bot's chosen appearance across map weapon rolls.
-replace("src/07-bots.js", "b.skin = skinOfWeapon(def); soldierLook(b.model, b.skin, skinRel(b)); // la tenue suit la famille de l'arme (06ga-tenues.js)", "soldierLook(b.model, b.skin, skinRel(b));")
+# Both initial bot creation and per-map weapon allocation use the same appearance.
 replace("src/07-bots.js", "b.skin = skinOfWeapon(def);", "b.skin = 'chibi';")
