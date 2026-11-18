@@ -553,3 +553,26 @@ replace('src/08h-azone-tactical.js','d.mesh.visible=true;fpvPose(d);', 'd.mesh.v
 replace('src/08e-fpv.js','function updateDrones(dt) {','function updateDrones(dt) {\n  azShotTick(dt);')
 replace('src/08e-fpv.js','function fpvClear() {','function fpvClear() { azShotClear();')
 p=Path('src/08h-azone-tactical.js');p.write_text(p.read_text()+SHOT_FX)
+
+# Restore shared match HUD only for CS Drone; retain compact Italy drone controls.
+replace('shell.html','#hud.fpv > :not(.az-drone-panel):not(.az-drone-reticle):not(#smokeFx):not(#iemFx){display:none!important}', '#hud.fpv:not(.az-battle) > :not(.az-drone-panel):not(.az-drone-reticle):not(#smokeFx):not(#iemFx){display:none!important}\n#hud.fpv.az-battle > :not(.score):not(#killfeed):not(#hitmarker):not(#dmgind):not(#msg):not(#cd):not(.az-drone-panel):not(.az-drone-reticle):not(#smokeFx):not(#iemFx){display:none!important}')
+replace('src/09-game.js', "function updateHud(dt) {", "function updateHud(dt) {\n  hudCls($('hud'),'az-battle',azBattle());")
+# Use the existing damage/kill pipeline once, including online headshot flags.
+replace('src/08h-azone-tactical.js','a.mag--;a.next=MATCH.time+.1;', 'a.mag--;a.next=MATCH.time+.1;if(d.owner===PL.ent)PL.actT=MATCH.time;')
+replace('src/08h-azone-tactical.js', 'applyDamage(hit.d.owner,20,d.owner,NET_WSPECIAL.drone,false,dir);if(d.owner===PL.ent)hitFeedback(false,!hit.d.owner.alive);', 'applyDamage(hit.d.owner,20,d.owner,NET_WSPECIAL.drone,azDroneHeadHit(hit.d,p,dir,w?w.t:100),dir);')
+p=Path('src/08h-azone-tactical.js');p.write_text(p.read_text()+'''
+// Camera housing is the drone head zone. Use physical pose, excluding cosmetic recoil/roll.
+function azDroneHeadHit(d,origin,dir,maxT){
+  const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(d.pitch*.35-Math.hypot(d.vel.x,d.vel.z)/FPV.boost*.35,d.yaw,d.roll,'YXZ'));
+  const front=new V3(0,0,-1).applyQuaternion(q);
+  if(dir.dot(front)>-.25)return false;
+  const center=new V3(0,.024,-.11).multiplyScalar(1.15).applyQuaternion(q).add(d.pos).sub(origin);
+  const t=center.dot(dir);return t>=0&&t<=maxT&&center.lengthSq()-t*t<=.05*.05;
+}
+function azDroneZoom(){return PILOT.d?[1,3,6][PILOT.d.azZoom||0]:1;}
+''')
+# Right-click cycles 3x / 6x / normal. Store on each drone so respawn resets it.
+replace('src/08-player.js', "if (e.button === 2) { if (adsToggleMode())", "if (e.button === 2 && PILOT.d) { PILOT.d.azZoom=((PILOT.d.azZoom||0)+1)%3;return; }\n  if (e.button === 2) { if (adsToggleMode())")
+replace('src/08-player.js', '* adsLookMul(Settings.adsMul);', '* (PILOT.d ? 1/azDroneZoom() : adsLookMul(Settings.adsMul));')
+replace('src/08e-fpv.js', 'const fovT=Settings.fov+8+Math.min(d.vel.length()/FPV.boost,1)*8;', 'const zoom=azDroneZoom(),baseFov=Settings.fov+8;\n  const fovT=zoom>1?2*Math.atan(Math.tan(baseFov*Math.PI/360)/zoom)*180/Math.PI:baseFov+Math.min(d.vel.length()/FPV.boost,1)*8;')
+replace('src/08e-fpv.js', 'function fpvLeave() {', 'function fpvLeave() {\n  if(PILOT.d)PILOT.d.azZoom=0;')
