@@ -503,3 +503,9 @@ function azDroneCinema(d,dt){
 }
 ''';p.write_text(s)
 p=Path('shell.html');s=p.read_text().replace(':not(.az-drone-panel):not(#smokeFx)',':not(.az-drone-panel):not(.az-drone-reticle):not(#smokeFx)');p.write_text(s)
+
+
+# Fast, firm four-beat match-start call, keeping combat voice clips unchanged.
+replace('src/09y-decompte.js', "'texas-voices/go.mp3'", "'texas-voices/go-four-fast.mp3'")
+replace('src/09y-decompte.js', "'texas-voices/' + file + '.mp3'", "'texas-voices/' + (file === 'go' ? 'go-four-fast' : file) + '.mp3'")
+replace('src/09y-decompte.js', "go.textContent = 'GO GO GO'", "go.textContent = 'GO GO GO GO'")
