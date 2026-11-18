@@ -448,3 +448,58 @@ function azDroneReturnStep(d,dt){
 '''
 p.write_text(s)
 p=Path('shell.html');s=p.read_text();s=s.replace('</style>', '#hud.fpv > :not(.az-drone-panel):not(#smokeFx):not(#iemFx){display:none!important}\n#hud.fpv .az-drone-panel{bottom:6%!important;background:rgba(12,20,25,.45)!important}\n</style>',1);p.write_text(s)
+
+# Visible chase-camera drone, visual barrel roll and occluded targeting laser.
+p=Path('src/08e-fpv.js');s=p.read_text();a=s.index('function fpvCamera(dt) {');b=s.index('\n}',a)+2
+s=s[:a]+'''function fpvCamera(dt) {
+  const d=PILOT.d;if(!d)return;
+  azDroneCinema(d,dt);
+  const fovT=Settings.fov+8+Math.min(d.vel.length()/FPV.boost,1)*8;
+  if(Math.abs(camera.fov-fovT)>.01){camera.fov=damp(camera.fov,fovT,7,dt);camera.updateProjectionMatrix();onResizeFx();}
+  VM.root.visible=false;
+}'''+s[b:]
+s=s.replace('d.mesh.visible = false;', 'd.mesh.visible = true;')
+s=s.replace('function fpvLeave() {','function fpvLeave() {\n  azDroneCinemaHide();')
+s=s.replace('function fpvClear() {','function fpvClear() { azDroneCinemaHide();')
+p.write_text(s)
+replace('src/08h-azone-tactical.js','existing.mesh.visible=false;','existing.mesh.visible=true;')
+replace('src/08h-azone-tactical.js',"if(PILOT.d && c==='KeyH')", "if(PILOT.d && c==='KeyR'){if(!PILOT.d.returning && !PILOT.d.azRollT)PILOT.d.azRollT=.85;return true;}\n  if(PILOT.d && c==='KeyH')")
+p=Path('src/08h-azone-tactical.js');s=p.read_text();s+='''
+const AZCIN={drone:null,line:null,dot:null,reticle:null,dir:new V3(),offset:new V3(),desired:new V3(),look:new V3(),start:new V3(),end:new V3(),projection:new V3()};
+function azDroneCinemaInit(){
+  if(AZCIN.line)return;
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
+  AZCIN.line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xff2020,transparent:true,opacity:.8,depthWrite:false,toneMapped:false}));AZCIN.line.frustumCulled=false;scene.add(AZCIN.line);
+  AZCIN.dot=new THREE.Mesh(new THREE.SphereGeometry(.035,8,6),new THREE.MeshBasicMaterial({color:0xff2525,toneMapped:false,depthWrite:false}));scene.add(AZCIN.dot);
+  const el=document.createElement('div');el.className='az-drone-reticle';el.setAttribute('aria-hidden','true');el.style.cssText='position:absolute;width:16px;height:16px;border:1px solid #ff3434;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 5px #f334;';
+  el.innerHTML='<i style="position:absolute;left:6px;top:6px;width:4px;height:4px;border-radius:50%;background:#ff3434"></i>';$('hud').append(el);AZCIN.reticle=el;
+}
+function azDroneCinemaHide(){
+  if(AZCIN.line){AZCIN.line.visible=false;AZCIN.dot.visible=false;AZCIN.reticle.style.display='none';}
+  AZCIN.drone=null;
+}
+function azDroneCinema(d,dt){
+  azDroneCinemaInit();const C=AZCIN;
+  C.dir.set(-Math.sin(d.yaw)*Math.cos(d.pitch),Math.sin(d.pitch),-Math.cos(d.yaw)*Math.cos(d.pitch));
+  C.offset.copy(C.dir).multiplyScalar(-1.65);C.offset.y+=.55;
+  const len=C.offset.length();C.offset.multiplyScalar(1/len);
+  const wall=rayWorld(d.pos.x,d.pos.y,d.pos.z,C.offset.x,C.offset.y,C.offset.z,len+.15,1);
+  C.desired.copy(d.pos).addScaledVector(C.offset,wall?Math.max(.06,Math.min(len,wall.t-.18)):len);
+  // Snap inward at walls; smooth only free-space movement to avoid clipping through buildings.
+  if(C.drone!==d || wall)camera.position.copy(C.desired);else camera.position.lerp(C.desired,1-Math.exp(-12*dt));
+  C.drone=d;C.look.copy(d.pos).addScaledVector(C.dir,8);camera.lookAt(C.look);
+  camera.rotateZ(d.roll*.12);camera.updateMatrixWorld(true);
+  d.mesh.visible=true;fpvPose(d);
+  if(d.azRollT>0){d.azRollT=Math.max(0,d.azRollT-dt);const t=1-d.azRollT/.85;d.mesh.rotation.z+=Math.PI*2*(t*t*(3-2*t));}
+  // Trace from the drone, not the chase camera: walls hide targets and stop the beam.
+  C.start.copy(d.pos);C.start.y+=.025;
+  const world=rayWorld(C.start.x,C.start.y,C.start.z,C.dir.x,C.dir.y,C.dir.z,100,1),limit=world?world.t:100;
+  const target=rayEntities(C.start,C.dir,limit,d.owner),range=target?Math.min(limit,target.t):limit;
+  C.end.copy(C.start).addScaledVector(C.dir,range);
+  const attr=C.line.geometry.attributes.position;attr.setXYZ(0,C.start.x,C.start.y,C.start.z);attr.setXYZ(1,C.end.x,C.end.y,C.end.z);attr.needsUpdate=true;C.line.visible=true;
+  C.dot.visible=!!(world||target);C.dot.position.copy(C.end).addScaledVector(C.dir,-.035);
+  C.projection.copy(C.end).project(camera);const visible=C.projection.z>-1&&C.projection.z<1&&Math.abs(C.projection.x)<1&&Math.abs(C.projection.y)<1;
+  C.reticle.style.display=visible?'block':'none';C.reticle.style.left=((C.projection.x+1)*50)+'%';C.reticle.style.top=((1-C.projection.y)*50)+'%';
+}
+''';p.write_text(s)
+p=Path('shell.html');s=p.read_text().replace(':not(.az-drone-panel):not(#smokeFx)',':not(.az-drone-panel):not(.az-drone-reticle):not(#smokeFx)');p.write_text(s)
