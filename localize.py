@@ -576,3 +576,7 @@ replace('src/08-player.js', "if (e.button === 2) { if (adsToggleMode())", "if (e
 replace('src/08-player.js', '* adsLookMul(Settings.adsMul);', '* (PILOT.d ? 1/azDroneZoom() : adsLookMul(Settings.adsMul));')
 replace('src/08e-fpv.js', 'const fovT=Settings.fov+8+Math.min(d.vel.length()/FPV.boost,1)*8;', 'const zoom=azDroneZoom(),baseFov=Settings.fov+8;\n  const fovT=zoom>1?2*Math.atan(Math.tan(baseFov*Math.PI/360)/zoom)*180/Math.PI:baseFov+Math.min(d.vel.length()/FPV.boost,1)*8;')
 replace('src/08e-fpv.js', 'function fpvLeave() {', 'function fpvLeave() {\n  if(PILOT.d)PILOT.d.azZoom=0;')
+
+# Drone rotor audio at 60% of its previous level, including synthesis fallback.
+replace('src/05-audio.js', 'const FPV_SND = { pilot: 0.75, other: 1.8,', 'const FPV_SND = { pilot: 0.45, other: 1.08,')
+replace('src/05-audio.js', 'out.gain.setTargetAtTime(pilot ? 0.12 : 0.7, t, 0.15);', 'out.gain.setTargetAtTime(pilot ? 0.072 : 0.42, t, 0.15);')
