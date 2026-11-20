@@ -29,7 +29,7 @@ payload=r'''
   </div>
 </div>
 <script>
-(()=>{const root=document.getElementById('azone-ios-controls');if(!root)return;const visible=()=>{const playing=typeof MATCH!=='undefined'&&MATCH.state!=='menu'&&MATCH.state!=='paused';root.style.display=(matchMedia('(pointer:coarse)').matches&&playing)?'block':'none';};setInterval(visible,400);visible();
+(()=>{const root=document.getElementById('azone-ios-controls');if(!root)return;const visible=()=>{const playing=document.body.classList.contains('playing')||document.body.classList.contains('game')||document.querySelector('canvas')!==null;root.style.display=(matchMedia('(pointer:coarse)').matches&&playing)?'block':'none';};setInterval(visible,400);visible();
 const active=new Map();
 function key(code,down){const key=({Space:' ',KeyG:'g',KeyX:'x',KeyR:'r',KeyC:'c',KeyQ:'q',KeyW:'w',KeyA:'a',KeyS:'s',KeyD:'d'})[code]||code;
 if(typeof KEYS!=='undefined'){KEYS[code]=down;}else{window.dispatchEvent(new KeyboardEvent(down?'keydown':'keyup',{key,code,bubbles:true,cancelable:true}));}}
