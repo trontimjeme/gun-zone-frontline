@@ -9,16 +9,16 @@ needle = "const MAPS = ["
 assert source.count(needle) == 1, "Map registry changed upstream"
 assert "id: 'csrose'" not in source
 source = source.replace(needle, """const MAPS = [
-  { id: 'csitalystyle', name: 'CS ITALY STYLE', tag: 'Italy · Rose Heritage', ok: true,
+  { id: 'csrose', name: 'CS ROSE', tag: 'Italy · Rose Heritage', ok: true,
     desc: 'Phố cổ Italy: tường gạch đỏ, vòm cổ điển, sân đất nung, hoa hồng leo và nắng tự nhiên.' },""", 1)
 map_path.write_text(source)
 
 sable_path = Path("src/02s-sable.js")
 sable = sable_path.read_text()
 assert "MAP_DEFS.italyreal = {" in sable, "Run italy_real.py first"
-assert "MAP_DEFS.csitalystyle" not in sable
+assert "MAP_DEFS.csrose" not in sable
 sable += """
-/* AZONE / CS ITALY STYLE: independent selectable visual treatment.
+/* AZONE / CS ROSE: independent selectable visual treatment.
    Stage 1: daylight, warm brick/terracotta grade, neutral stone bounce.
    Combat geometry, collision, nav, spawn and bot routes inherited unchanged.
    Future stage: real rose meshes, arches and photographic PBR textures. */
@@ -50,7 +50,7 @@ const CS_ITALY_STYLE_ATMO = {
   rays: [1.0, 0.92, 0.8],
   bloom: [0.12, 0.32, 0.9]
 };
-MAP_DEFS.csitalystyle = {
+MAP_DEFS.csrose = {
   ...MAP_DEFS.sable,
   atmo: CS_ITALY_STYLE_ATMO,
   art: { ...MAP_DEFS.sable.art },
@@ -91,4 +91,4 @@ function buildCsRoseDecor() {
 }
 """
 sable_path.write_text(sable)
-print("CS ITALY STYLE registered independently (visual atmosphere stage 1)")
+print("CS ROSE registered independently (visual atmosphere stage 1)")
