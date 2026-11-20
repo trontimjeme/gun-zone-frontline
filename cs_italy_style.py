@@ -1,4 +1,4 @@
-"""Register a separate CS ITALY STYLE map inspired by the supplied brick-and-rose courtyard photograph.
+"""Register a separate CS ROSE map inspired by the supplied brick-and-rose courtyard photograph.
 This first stage changes environment identity, not level geometry. Never modifies the existing maps.
 """
 from pathlib import Path
@@ -7,7 +7,7 @@ map_path = Path("src/02-map.js")
 source = map_path.read_text()
 needle = "const MAPS = ["
 assert source.count(needle) == 1, "Map registry changed upstream"
-assert "id: 'csitalystyle'" not in source
+assert "id: 'csrose'" not in source
 source = source.replace(needle, """const MAPS = [
   { id: 'csitalystyle', name: 'CS ITALY STYLE', tag: 'Italy · Rose Heritage', ok: true,
     desc: 'Phố cổ Italy: tường gạch đỏ, vòm cổ điển, sân đất nung, hoa hồng leo và nắng tự nhiên.' },""", 1)
@@ -53,8 +53,42 @@ const CS_ITALY_STYLE_ATMO = {
 MAP_DEFS.csitalystyle = {
   ...MAP_DEFS.sable,
   atmo: CS_ITALY_STYLE_ATMO,
-  art: { ...MAP_DEFS.sable.art }
+  art: { ...MAP_DEFS.sable.art },
+  // New rose-and-brick environment pass, no changes to the original Sable map.
+  build() { MAP_DEFS.sable.build(); buildCsRoseDecor(); }
 };
+function buildCsRoseDecor() {
+  // Visual-only architecture details outside primary combat lanes.
+  // These do not alter collision, spawns, or bot navigation.
+  const M = DECOR;
+  const roses = [[-35,18],[-35,-18],[-35,34],[-35,-34],[35,18],[35,-18],[35,34],[35,-34],[-14,38],[-14,-38]];
+  for (const [x,z] of roses) {
+    const side = x < 0 ? 1 : -1;
+    M.save().world(1).color([0.52,0.31,0.22]);
+    M.boxB('brick', x, x+side*0.04, 0.15, 4.8, z-1.25,z+1.25);
+    M.restore();
+    // Climbing rose stems, green leaves and red blossoms.
+    for (let i=0;i<9;i++) {
+      const y=0.5+i*0.43, zz=z+Math.sin(i*1.9)*0.85;
+      M.save().world(1).color([0.17,0.34,0.13]);
+      M.boxB('wood',Math.min(x,x+side*0.09),Math.max(x,x+side*0.09),y,y+0.13,zz-0.12,zz+0.12);
+      M.restore();
+      if (i%2===0) {
+        M.save().world(1).color([0.70,0.055,0.065]);
+        M.boxB('paintwood',Math.min(x,x+side*0.14),Math.max(x,x+side*0.14),y+0.13,y+0.33,zz-0.13,zz+0.13);
+        M.restore();
+      }
+    }
+  }
+  // Terracotta accents along existing boundary walls, non-colliding.
+  for (const z of [-43,-27,27,43]) {
+    for (const x of [-35.5,35.5]) {
+      M.save().world(1).color([0.64,0.29,0.18]);
+      M.boxB('brick',x-0.13,x+0.13,0.1,0.55,z-0.3,z+0.3);
+      M.restore();
+    }
+  }
+}
 """
 sable_path.write_text(sable)
 print("CS ITALY STYLE registered independently (visual atmosphere stage 1)")
