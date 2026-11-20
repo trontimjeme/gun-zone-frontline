@@ -17,6 +17,7 @@ if ! python3 -c 'import PIL' 2>/dev/null; then
 fi
 python3 "$root/brand.py"
 python3 "$root/localize.py"
+python3 "$root/hide_equipment_tutorial.py"
 python3 "$root/italy_real.py"
 python3 "$root/cs_italy_style.py"
 curl -fsSL --retry 3 https://texas-eta.vercel.app/audio/theme.mp3 -o dist/menu-theme.mp3
