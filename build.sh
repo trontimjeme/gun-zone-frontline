@@ -24,3 +24,7 @@ cp dist/riposte-frontline.html dist/index.html
 cp LICENSE NOTICE.md assets/sfx/credits.json dist/
 mkdir -p "$root/dist"
 cp -R dist/. "$root/dist/"
+
+# Isolated DARYA review lab. Keep the production game logic untouched.
+mkdir -p "$root/dist/darya"
+cp -R "$root/darya-demo/." "$root/dist/darya/"
