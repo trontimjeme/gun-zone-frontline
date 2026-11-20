@@ -20,24 +20,24 @@ if q.exists():
  #touch:not(.hidden):not(.fpv) .tc-fire-l {
    display:grid!important;visibility:visible!important;opacity:1!important;
    pointer-events:auto!important;z-index:25!important;
-   border:2px solid #f5c66a!important;
-   background:rgba(101,52,28,.52)!important;
-   box-shadow:0 0 0 3px #0004,0 0 15px #edb34e66!important;
+   border:2px solid #e8bd59!important;
+   background:radial-gradient(circle at 45% 40%,rgba(74,61,34,.65),rgba(10,12,12,.85))!important;
+   box-shadow:0 0 0 2px #080908b0,0 0 10px #e6b34d99,inset 0 0 9px #e6b34d33!important;
  }
- #touch:not(.hidden):not(.fpv) .tc-fire { --s:20; }
+ #touch:not(.hidden):not(.fpv) .tc-fire { --s:20; }\n #touch:not(.hidden):not(.fpv) .tc-fire svg,\n #touch:not(.hidden):not(.fpv) .tc-fire-l svg {width:57%!important;height:57%!important;stroke:#fff5d2!important;stroke-width:1.9!important;filter:drop-shadow(0 0 4px #e9b64d)!important;}
  #touch:not(.hidden):not(.fpv) .tc-fire-l {
-   --s:15;left:20.5vw!important;right:auto!important;top:48.5vh!important;bottom:auto!important;
+   --s:15;left:19.5vw!important;right:auto!important;top:52vh!important;bottom:auto!important;
  }
  #touch:not(.hidden):not(.fpv) .tc-az-drone {
    display:grid!important;position:absolute!important;right:2.8vw!important;
-   top:30vh!important;bottom:auto!important;left:auto!important;
+   top:21vh!important;bottom:auto!important;left:auto!important;
    width:clamp(48px,9vh,68px)!important;height:clamp(48px,9vh,68px)!important;
    border:2px solid #e7b94e!important;border-radius:50%!important;
-   background:#17242bc9!important;color:#f8e9bd!important;
-   box-shadow:0 0 12px #e4ae4d77!important;z-index:26!important;
+   background:radial-gradient(circle,#27302bbf,#090c0de8)!important;color:#f8e9bd!important;
+   box-shadow:0 0 0 2px #0009,0 0 10px #e4ae4d99!important;z-index:26!important;
    pointer-events:auto!important;
  }
- #touch:not(.hidden):not(.fpv) .tc-az-drone:after {
+ #touch:not(.hidden):not(.fpv) .tc-az-drone svg {width:63%!important;height:63%!important;stroke:#f4ebd3!important;transform:translateY(-4px)!important;}\n #touch:not(.hidden):not(.fpv) .tc-az-drone:after {
    content:'DRONE';position:absolute;bottom:2px;font:700 9px system-ui;
    color:#fff;letter-spacing:.02em;
  }
