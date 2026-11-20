@@ -580,3 +580,35 @@ replace('src/08e-fpv.js', 'function fpvLeave() {', 'function fpvLeave() {\n  if(
 # Drone rotor audio at 60% of its previous level, including synthesis fallback.
 replace('src/05-audio.js', 'const FPV_SND = { pilot: 0.75, other: 1.8,', 'const FPV_SND = { pilot: 0.45, other: 1.08,')
 replace('src/05-audio.js', 'out.gain.setTargetAtTime(pilot ? 0.12 : 0.7, t, 0.15);', 'out.gain.setTargetAtTime(pilot ? 0.072 : 0.42, t, 0.15);')
+
+# Four-position mouse-wheel equipment selection; 8 always selects the explosive mine.
+replace('src/08h-azone-tactical.js', "if(c==='Digit8'&&!PILOT.d){AZTACT.selected=AZTACT.selected==='frag'?'smoke':'frag';hudMsg('Chọn '+(AZTACT.selected==='smoke'?'mìn khói':'mìn nổ')+' · Chuột trái đặt · 8 đổi loại','ally',2);return true;}", "if(c==='Digit8'&&!PILOT.d){azSelectMine('frag');return true;}")
+replace('src/08a-binds.js', "Chọn mìn / đổi mìn khói", "Chọn mìn nổ")
+replace('src/08-player.js', "  quickSwap();\n}, { passive: true });", "  azEquipmentWheel(e.deltaY);\n}, { passive: true });")
+replace('src/08-player.js', 'function switchWeapon(i) {', "function switchWeapon(i) {\n  AZTACT.selected='';")
+replace('src/08h-azone-tactical.js', "['Digit1','Digit2','Digit3','KeyQ','KeyF','KeyG']", "['Digit1','Digit2','Digit3','Digit7','KeyQ','KeyF','KeyG']")
+replace('src/08h-azone-tactical.js', "'8 · Mìn nổ '+(stock.frag||0)+' | Mìn khói '+(stock.smoke||0)", "azEquipmentLabel(stock)")
+p=Path('src/08h-azone-tactical.js');p.write_text(p.read_text()+'''
+function azSelectMine(type){
+  if(azBattle()||PILOT.d||MECHA_P.me||!PL.ent.alive||playHold()||KS.mode||PL.knifeT>0||PL.nadeState)return false;
+  italyGunOff();PL.reload=null;PL.adsWant=false;PL.held=PL.queued=false;
+  AZTACT.selected=type;
+  hudMsg((type==='frag'?'Ô 3 · Mìn nổ':'Ô 4 · Mìn khói')+((PL.ent.azStock?.[type]||0)>0?' · Chuột trái để đặt':' · Đã hết'),'ally',2);
+  return true;
+}
+function azEquipmentSlot(){
+  if(AZTACT.selected==='frag')return 2;
+  if(AZTACT.selected==='smoke')return 3;
+  return PL.switching>0&&PL.switchTo>=0?PL.switchTo:PL.cur;
+}
+function azEquipmentWheel(delta){
+  if(!Number.isFinite(delta)||delta===0||!PL.ent.alive||PILOT.d||MECHA_P.me||CHAT.open||azBattle()||playHold()||KS.mode||PL.knifeT>0||PL.nadeState)return;
+  const slot=(azEquipmentSlot()+(delta>0?1:3))%4;
+  if(slot<2){PL.held=PL.queued=false;switchWeapon(slot);}
+  else azSelectMine(slot===2?'frag':'smoke');
+}
+function azEquipmentLabel(stock){
+  const selected=azEquipmentSlot();
+  return ['1 · Súng chính','2 · Súng phụ','3 · Mìn nổ '+(stock.frag||0),'4 · Mìn khói '+(stock.smoke||0)].map((text,i)=>i===selected?'【'+text+'】':text).join(' | ')+' · Phím 8: mìn nổ';
+}
+''')
