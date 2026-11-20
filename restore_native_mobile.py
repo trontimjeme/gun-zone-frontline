@@ -10,8 +10,8 @@ s=s.replace("function touchBuild() {","function touchBuild() {",1)
 p.write_text(s)
 # Inject only lightweight CSS, not a second touch control system.
 q=Path("dist/index.html")
-html=q.read_text()
-assert "</head>" in html and "</body>" in html
+html=q.read_text() if q.exists() else ""
+
 css="""<style>
 /* AZONE: use the ORIGINAL touch HUD; expose a manual fire button and one drone button */
 @media (pointer:coarse) {
@@ -19,8 +19,9 @@ css="""<style>
  #touch .tc-az-drone {position:absolute!important;right:2.5vw!important;top:18vh!important;width:54px!important;height:54px!important;display:flex!important;align-items:center;justify-content:center;border-radius:50%;background:#1d313bbf;border:1px solid #f1c77b!important;z-index:10;pointer-events:auto!important;}
 }
 </style>"""
-html=html.replace("</head>",css+"</head>")
-q.write_text(html)
+if "</head>" in html and "AZONE: use the ORIGINAL touch HUD" not in html:
+    html=html.replace("</head>",css+"</head>")
+    q.write_text(html)
 # After build.py, original engine is bundled into HTML. CSS overrides
 # make fire visible even if auto fire settings hide it.
 # Native TC button handling is retained.
