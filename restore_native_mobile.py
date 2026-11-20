@@ -4,7 +4,8 @@ p=Path("src/09q-tactile.js")
 s=p.read_text()
 needle="  ['fireL', 'tc-fire-l l', 'fire', _t('Tirer'), 'hold', (d) => touchFire(d, 'l')],"
 assert s.count(needle)==1
-s=s.replace(needle,needle+"\n  ['azDrone', 'tc-az-drone', 'uav', 'DRONE', 'tap', () => azDroneLaunch()],")
+if 'tc-az-drone' not in s:
+    s=s.replace(needle,needle+"\n  ['azDrone', 'tc-az-drone', 'uav', 'DRONE', 'tap', () => azDroneLaunch()],")
 # Do not replace the existing touch system: both fire buttons call native touchFire.
 s=s.replace("fireL: [0.1016, 0.5981, 13, 1]", "fireL: [0.205, 0.485, 15, 0]")
 s=s.replace("fire: [0.8033, 0.671, 20, 0]", "fire: [0.8033, 0.671, 20, 0]")
