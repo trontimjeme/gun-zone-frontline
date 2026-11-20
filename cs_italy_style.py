@@ -65,7 +65,7 @@ function buildCsRoseDecor() {
   for (const [x,z] of roses) {
     const side = x < 0 ? 1 : -1;
     M.save().world(1).color([0.52,0.31,0.22]);
-    M.boxB('brick', x, x+side*0.04, 0.15, 4.8, z-1.25,z+1.25);
+    M.boxB('brick', Math.min(x,x+side*0.04), Math.max(x,x+side*0.04), 0.15, 4.8, z-1.25,z+1.25);
     M.restore();
     // Climbing rose stems, green leaves and red blossoms.
     for (let i=0;i<9;i++) {
