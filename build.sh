@@ -23,6 +23,7 @@ curl -fsSL --retry 3 https://texas-eta.vercel.app/audio/theme.mp3 -o dist/menu-t
 echo '218b40825e8f5a56ed2a65558cd958b2378b45fdf1fa8fa2d5e90082fa207f5b  dist/menu-theme.mp3' | sha256sum -c -
 python3 build.py
 cp dist/riposte-frontline.html dist/index.html
+python3 "$root/ios_controls.py"
 cp LICENSE NOTICE.md assets/sfx/credits.json dist/
 mkdir -p "$root/dist"
 cp -R dist/. "$root/dist/"
