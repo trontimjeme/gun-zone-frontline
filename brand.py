@@ -5,7 +5,7 @@ import os, re, shutil
 logo = Image.open("azone-logo.png").convert("RGB")
 logo.save("assets/logo.webp", lossless=True)
 mark = logo.crop((3, 3, 39, 39))
-for path in [*Path("assets/icon").glob("*"), *Path("assets/deck").glob("*"), Path("assets/apercu.jpg")]:
+for path in [*Path("assets/icon").glob("*"), *Path("assets/deck").glob("*")]:
     if path.suffix not in {".ico", ".png", ".jpg"}:
         continue
     size = Image.open(path).size
@@ -15,6 +15,15 @@ for path in [*Path("assets/icon").glob("*"), *Path("assets/deck").glob("*"), Pat
     art = art.resize(tuple(max(1, round(v * ratio)) for v in art.size), Image.Resampling.LANCZOS)
     canvas.paste(art, tuple((a-b)//2 for a,b in zip(size,art.size)))
     canvas.save(path)
+share_image = Path(__file__).resolve().parent / "assets" / "link-preview.jpg"
+shutil.copyfile(share_image, "assets/apercu.jpg")
+with Image.open(share_image) as preview:
+    shell = Path("shell.html")
+    html = shell.read_text()
+    html = html.replace('property="og:image:width" content="1200"', f'property="og:image:width" content="{preview.width}"')
+    html = html.replace('property="og:image:height" content="630"', f'property="og:image:height" content="{preview.height}"')
+    shell.write_text(html)
+
 for path in [Path("shell.html"), Path("build.py"), Path("assets/deck/installer.sh"), Path("i18n/en.txt"), *Path("src").glob("*.js")]:
     s = path.read_text()
     s = re.sub("Riposte: Frontline", "Gun ZONE", s, flags=re.I)
