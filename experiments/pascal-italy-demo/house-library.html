@@ -13,7 +13,8 @@
   <span class="project">Gun Zone Project <small>ITALY REAL · Bố cục thử nghiệm</small></span>
   <div class="project-actions">
     <button id="importButton" type="button">Mở JSON</button>
-    <button id="export" type="button">Xuất JSON</button>
+    <button id="export" type="button">Lưu bố cục</button>
+    <button id="exportMap" type="button">Xuất map cho game</button>
     <input type="file" id="importFile" accept=".json,application/json" hidden>
   </div>
 </header>
@@ -36,6 +37,7 @@
           <summary>Công trình <output id="sceneCount">0</output></summary>
           <ul id="sceneTree"></ul>
           <p class="muted" id="sceneEmpty">Chưa có công trình đã đặt.</p>
+          <a href="./scene.json" download="azone-scene-sample.json">Tải JSON mẫu Pascal</a>
         </details>
       </details>
     </div>
@@ -87,6 +89,7 @@
     </div>
   </aside>
 </main>
+<script src="./map-format.js"></script>
 <script type="importmap">{"imports":{"three":"https://esm.sh/three@0.181.2","three/addons/":"https://esm.sh/three@0.181.2/examples/jsm/"}}</script><script type="module">import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';const assets=[{"id":"house_simple","name":"Nhà 1 tầng","url":"https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/casa_simples.glb","license":"CC0-1.0","source_url":"https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/casa_simples.glb"},{"id":"house_two_story","name":"Nhà 2 tầng","url":"https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/casa_sobrado.glb","license":"CC0-1.0","source_url":"https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/casa_sobrado.glb"},{"id":"house_twin","name":"Nhà liền kề","url":"https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/casas_geminadas.glb","license":"CC0-1.0","source_url":"https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/casas_geminadas.glb"},{"id":"building_tall","name":"Nhà cao tầng","url":"https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/predio_alto.glb","license":"CC0-1.0","source_url":"https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/predio_alto.glb"},{"id":"apartment","name":"Chung cư","url":"https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/predio_apartamentos.glb","license":"CC0-1.0","source_url":"https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/predio_apartamentos.glb"}];const s=document.getElementById('view'),scene=new THREE.Scene();scene.background=new THREE.Color('#8e9d9c');const camera=new THREE.PerspectiveCamera(48,1,.1,500);camera.position.set(11,10,13);let renderer = null;
 let controls = null;
 let plan = null;
@@ -167,7 +170,7 @@ function drawPlan() {
   instances.forEach((o, i) => drawObject(o, i === selectedPlaced, String(i + 1)));
   ctx.restore();
 }
-scene.add(new THREE.HemisphereLight(0xffffff,0x665844,2.5));let light=new THREE.DirectionalLight(0xffe1b4,2.2);light.position.set(-12,20,12);scene.add(light);let ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0x8d877a,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);const grid = new THREE.GridHelper(70,35,0xb6a078,0x5b5141); scene.add(grid);let current=null,selected=0,instances=[],cache=new Map();const loader=new GLTFLoader();function state(t){document.getElementById('status').textContent=t}function updateBtns(){document.querySelectorAll('#choices button').forEach((b,i)=>b.classList.toggle('active',i===selected))}async function obtain(asset){if(cache.has(asset.id))return cache.get(asset.id).clone(true);return new Promise((resolve,reject)=>loader.load(asset.url,g=>{cache.set(asset.id,g.scene);resolve(g.scene.clone(true))},undefined,reject))}function normalize(obj){const bounds=new THREE.Box3().setFromObject(obj),size=bounds.getSize(new THREE.Vector3()),scale=4/Math.max(size.x,size.z,size.y,0.01);obj.scale.multiplyScalar(scale);bounds.setFromObject(obj);obj.userData.footprint=bounds.getSize(new THREE.Vector3());obj.position.y-=bounds.min.y;obj.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});return obj}async function select(i){selected=i;updateBtns();const asset=assets[i];document.getElementById('title').textContent=asset.name;document.getElementById('name').textContent=asset.name;document.getElementById('source').href=asset.source_url;state('Đang tải GLB từ nguồn CC0…');if(current){scene.remove(current);current=null}try{const preview=normalize(await obtain(asset));if(selected!==i)return;current=preview;scene.add(current);state((renderer ? 'Đã nạp GLB: ' : 'Đã nạp mặt bằng: ') + asset.name)}catch(e){if(selected!==i)return;state('Không tải được GLB: '+String(e.message||e).slice(0,120));console.error(e)}}assets.forEach((a,i)=>{const b=document.createElement('button');b.textContent=a.name;const t=document.createElement('span');t.textContent='GLB • CC0';b.appendChild(t);b.onclick=()=>select(i);document.getElementById('choices').appendChild(b)});const placed=document.getElementById('placed');
+scene.add(new THREE.HemisphereLight(0xffffff,0x665844,2.5));let light=new THREE.DirectionalLight(0xffe1b4,2.2);light.position.set(-12,20,12);scene.add(light);let ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0x8d877a,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);const grid = new THREE.GridHelper(70,35,0xb6a078,0x5b5141); scene.add(grid);let current=null,selected=0,instances=[],cache=new Map();const loader=new GLTFLoader();function state(t){document.getElementById('status').textContent=t}function updateBtns(){document.querySelectorAll('#choices button').forEach((b,i)=>b.classList.toggle('active',i===selected))}async function obtain(asset){if(cache.has(asset.id))return cache.get(asset.id).clone(true);return new Promise((resolve,reject)=>loader.load(asset.url,g=>{cache.set(asset.id,g.scene);resolve(g.scene.clone(true))},undefined,reject))}function normalize(obj){const bounds=new THREE.Box3().setFromObject(obj),size=bounds.getSize(new THREE.Vector3()),scale=4/Math.max(size.x,size.z,size.y,0.01);obj.scale.multiplyScalar(scale);bounds.setFromObject(obj);obj.userData.footprint=bounds.getSize(new THREE.Vector3());const center=bounds.getCenter(new THREE.Vector3());center.y=bounds.min.y;obj.userData.centerOffset=center.sub(obj.position);obj.position.y-=bounds.min.y;obj.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});return obj}async function select(i){selected=i;updateBtns();const asset=assets[i];document.getElementById('title').textContent=asset.name;document.getElementById('name').textContent=asset.name;document.getElementById('source').href=asset.source_url;state('Đang tải GLB từ nguồn CC0…');if(current){scene.remove(current);current=null}try{const preview=normalize(await obtain(asset));if(selected!==i)return;current=preview;current.visible=!instances.length;scene.add(current);state((renderer ? 'Đã nạp GLB: ' : 'Đã nạp mặt bằng: ') + asset.name)}catch(e){if(selected!==i)return;state('Không tải được GLB: '+String(e.message||e).slice(0,120));console.error(e)}}assets.forEach((a,i)=>{const b=document.createElement('button');b.textContent=a.name;const t=document.createElement('span');t.textContent='GLB • CC0';b.appendChild(t);b.onclick=()=>select(i);document.getElementById('choices').appendChild(b)});const placed=document.getElementById('placed');
 const tree=document.getElementById('sceneTree');
 const search=document.getElementById('sceneSearch');
 let selectionBox=null;
@@ -175,7 +178,7 @@ function renderTree(){
   document.getElementById('sceneCount').value=instances.length;
   tree.replaceChildren();
   instances.forEach((o,i)=>{
-    const name=assets.find(a=>a.id===o.userData.assetId).name;
+    const name=objectName(o);
     if(!name.toLocaleLowerCase('vi').includes(search.value.toLocaleLowerCase('vi').trim()))return;
     const item=document.createElement('li');
     const button=document.createElement('button');
@@ -199,8 +202,137 @@ document.getElementById('isoView').onclick=()=>setView(false);
 document.getElementById('topView').onclick=()=>setView(true);
 document.getElementById('gridToggle').onchange=event=>{grid.visible=event.target.checked;};
 setView(!renderer);
-const px=document.getElementById('px'),pz=document.getElementById('pz'),ry=document.getElementById('ry');let selectedPlaced=-1;const snapshot=()=>({schemaVersion:1,app:'AZONE 3D MAP EDITOR',units:'demo-units',source:'cc0-kayquer-house-kit',objects:instances.map(o=>({assetId:o.userData.assetId,position:[o.position.x,0,o.position.z],rotationY:o.rotation.y}))});function save(){try{localStorage.setItem('azone-house-map-v1',JSON.stringify(snapshot()))}catch(e){console.warn(e)}}function refreshPlaced(){placed.replaceChildren();instances.forEach((o,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent=(i+1)+'. '+(assets.find(a=>a.id===o.userData.assetId)?.name||o.userData.assetId);placed.appendChild(opt)});selectedPlaced=Math.max(-1,Math.min(selectedPlaced,instances.length-1));if(selectedPlaced>=0){placed.value=String(selectedPlaced);const o=instances[selectedPlaced];px.value=String(o.position.x);pz.value=String(o.position.z);ry.value=String(Math.round(THREE.MathUtils.radToDeg(o.rotation.y)))}else{px.value=pz.value=ry.value=''}
+const px=document.getElementById('px'),pz=document.getElementById('pz'),ry=document.getElementById('ry');let selectedPlaced=-1;const snapshot=()=>({
+  schemaVersion:1, app:'AZONE 3D MAP EDITOR', units:'demo-units',
+  boxes:instances.filter(o=>o.userData.kind).map(objectBox),
+  objects:instances.filter(o=>o.userData.assetId).map(o=>({
+    assetId:o.userData.assetId,position:[o.position.x,0,o.position.z],rotationY:o.rotation.y
+  }))
+});
+function save(){try{localStorage.setItem('azone-house-map-v1',JSON.stringify(snapshot()))}catch(e){console.warn(e)}}function refreshPlaced(){placed.replaceChildren();instances.forEach((o,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent=(i+1)+'. '+objectName(o);placed.appendChild(opt)});selectedPlaced=Math.max(-1,Math.min(selectedPlaced,instances.length-1));if(selectedPlaced>=0){placed.value=String(selectedPlaced);const o=instances[selectedPlaced];px.value=String(o.position.x);pz.value=String(o.position.z);ry.value=String(Math.round(THREE.MathUtils.radToDeg(o.rotation.y)))}else{px.value=pz.value=ry.value=''}
 renderTree();
+if(current)current.visible=!instances.length;
 if(selectionBox){scene.remove(selectionBox);selectionBox.geometry.dispose();selectionBox.material.dispose();selectionBox=null;}
 if(renderer && selectedPlaced>=0){selectionBox=new THREE.BoxHelper(instances[selectedPlaced],0xe6b95e);scene.add(selectionBox);}
-}placed.onchange=()=>{selectedPlaced=Number(placed.value);refreshPlaced()};async function addAsset(assetId,pos,angle){const asset=assets.find(a=>a.id===assetId);if(!asset)throw Error('Unknown asset '+assetId);const obj=normalize(await obtain(asset));obj.userData.assetId=assetId;obj.position.set(pos[0],0,pos[2]);obj.rotation.y=angle;scene.add(obj);instances.push(obj);selectedPlaced=instances.length-1;refreshPlaced();save()}document.getElementById('add').onclick=async()=>{try{const n=instances.length;await addAsset(assets[selected].id,[(n%5-2)*5,0,Math.floor(n/5)*6-5],0);state('Đã đặt '+instances.length+' nhà. Chọn nhà để chỉnh tọa độ.')}catch(e){state('Không thể thêm: '+e.message)}};document.getElementById('apply').onclick=()=>{const o=instances[selectedPlaced];if(!o)return state('Hãy thêm hoặc chọn nhà');const x=Number(px.value),z=Number(pz.value),r=Number(ry.value);if(![x,z,r].every(Number.isFinite)||Math.max(Math.abs(x),Math.abs(z))>1000)return state('Tọa độ không hợp lệ');o.position.set(x,0,z);o.rotation.y=THREE.MathUtils.degToRad(r);selectionBox?.update();save();state('Đã cập nhật vị trí và xoay nhà')};document.getElementById('remove').onclick=()=>{if(selectedPlaced<0)return;const [o]=instances.splice(selectedPlaced,1);scene.remove(o);selectedPlaced=Math.min(selectedPlaced,instances.length-1);refreshPlaced();save();state('Đã xóa nhà')};document.getElementById('clear').onclick=()=>{for(const o of instances)scene.remove(o);instances=[];selectedPlaced=-1;refreshPlaced();save();state('Đã dọn bố cục map')};document.getElementById('export').onclick=()=>{const blob=new Blob([JSON.stringify(snapshot(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='azone-house-map-v1.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);state('Đã xuất JSON mô tả bố cục map (không chứa mesh GLB)')};document.getElementById('importButton').onclick=()=>document.getElementById('importFile').click();document.getElementById('importFile').onchange=async(e)=>{const file=e.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.schemaVersion!==1||!Array.isArray(data.objects)||data.objects.length>100)throw Error('Sai định dạng hoặc quá 100 đối tượng');const valid=data.objects.every(o=>assets.some(a=>a.id===o.assetId)&&Array.isArray(o.position)&&o.position.length===3&&o.position.every(n=>typeof n==='number'&&Number.isFinite(n)&&Math.abs(n)<1001)&&Number.isFinite(o.rotationY));if(!valid)throw Error('Dữ liệu đối tượng không hợp lệ');const staged=[];for(const d of data.objects){const asset=assets.find(a=>a.id===d.assetId);const obj=normalize(await obtain(asset));obj.userData.assetId=d.assetId;obj.position.set(d.position[0],0,d.position[2]);obj.rotation.y=d.rotationY;staged.push(obj)}for(const o of instances)scene.remove(o);instances=staged;for(const o of instances)scene.add(o);selectedPlaced=instances.length?0:-1;refreshPlaced();save();state('Đã nhập '+instances.length+' mô hình từ JSON')}catch(err){state('Lỗi nhập JSON: '+err.message)}e.target.value=''};refreshPlaced();select(0);try{const saved=localStorage.getItem('azone-house-map-v1');if(saved){const data=JSON.parse(saved);if(data?.schemaVersion===1&&Array.isArray(data.objects)&&data.objects.length<=100){(async()=>{let count=0;for(const o of data.objects){if(!assets.some(a=>a.id===o.assetId)||!Array.isArray(o.position)||o.position.length!==3||!o.position.every(v=>Number.isFinite(v)&&Math.abs(v)<=1000)||!Number.isFinite(o.rotationY))continue;try{const obj=normalize(await obtain(assets.find(a=>a.id===o.assetId)));obj.userData.assetId=o.assetId;obj.position.set(o.position[0],0,o.position[2]);obj.rotation.y=o.rotationY;scene.add(obj);instances.push(obj);count++}catch(e){console.warn('Asset restore failed',o.assetId,e)}}selectedPlaced=count?0:-1;refreshPlaced();state('Đã khôi phục '+count+' nhà từ trình duyệt')})()}}}catch(e){console.warn('Stored map invalid',e)}function animate(){requestAnimationFrame(animate);if(renderer){controls.update();renderer.render(scene,camera)}else{drawPlan()}}animate();</script></body></html>
+}placed.onchange=()=>{selectedPlaced=Number(placed.value);refreshPlaced()};async function addAsset(assetId,pos,angle){const asset=assets.find(a=>a.id===assetId);if(!asset)throw Error('Unknown asset '+assetId);const obj=normalize(await obtain(asset));obj.userData.assetId=assetId;obj.position.set(pos[0],0,pos[2]);obj.rotation.y=angle;scene.add(obj);instances.push(obj);selectedPlaced=instances.length-1;refreshPlaced();save()}document.getElementById('add').onclick=async()=>{try{const n=instances.length;if(instances.filter(o=>o.userData.assetId).length>=100)throw new Error("Tối đa 100 mẫu nhà.");await addAsset(assets[selected].id,[(n%5-2)*5,0,Math.floor(n/5)*6-5],0);state('Đã đặt '+instances.length+' nhà. Chọn nhà để chỉnh tọa độ.')}catch(e){state('Không thể thêm: '+e.message)}};document.getElementById('apply').onclick=()=>{const o=instances[selectedPlaced];if(!o)return state('Hãy thêm hoặc chọn nhà');const x=Number(px.value),z=Number(pz.value),r=Number(ry.value);if(![x,z,r].every(Number.isFinite)||Math.max(Math.abs(x),Math.abs(z))>1000)return state('Tọa độ không hợp lệ');o.position.set(x,o.position.y,z);o.rotation.y=THREE.MathUtils.degToRad(r);selectionBox?.update();save();state('Đã cập nhật vị trí và xoay nhà')};document.getElementById('remove').onclick=()=>{if(selectedPlaced<0)return;const [o]=instances.splice(selectedPlaced,1);scene.remove(o);if(o.userData.kind){o.geometry.dispose();o.material.dispose();}selectedPlaced=Math.min(selectedPlaced,instances.length-1);refreshPlaced();save();state('Đã xóa nhà')};function objectName(o) {
+  return assets.find(a => a.id === o.userData.assetId)?.name ||
+    {wall:'Tường', roof:'Mái', floor:'Sàn', building:'Công trình'}[o.userData.kind];
+}
+function objectBox(o) {
+  const {footprint, kind = 'building', centerOffset} = o.userData;
+  const offset = centerOffset ? centerOffset.clone().applyAxisAngle(new THREE.Vector3(0,1,0), o.rotation.y) : new THREE.Vector3();
+  return {
+    position:[o.position.x+offset.x, o.position.y+offset.y, o.position.z+offset.z],
+    size:footprint.toArray(), yaw:o.rotation.y % (Math.PI*2), kind
+  };
+}
+function primitive(b) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...b.size),
+    new THREE.MeshStandardMaterial({color:AZMapFile.materials[b.kind], roughness:.9}));
+  mesh.geometry.translate(0,b.size[1]/2,0);
+  mesh.position.set(...b.position);
+  mesh.rotation.y = b.yaw;
+  mesh.castShadow = mesh.receiveShadow = true;
+  mesh.userData = {kind:b.kind, footprint:new THREE.Vector3(...b.size)};
+  return mesh;
+}
+function download(data, filename) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data,null,2)], {type:'application/json'}));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+function replaceInstances(staged) {
+  for (const o of instances) {
+    scene.remove(o);
+    if (o.userData.kind) {
+      o.geometry.dispose();
+      o.material.dispose();
+    }
+  }
+  instances = staged;
+  for (const o of staged) scene.add(o);
+  selectedPlaced = staged.length ? 0 : -1;
+  refreshPlaced();
+}
+async function stageLayout(data) {
+  if (data?.nodes) return AZMapFile.fromPascal(data).boxes.map(primitive);
+  if (data?.format === 'azone-gun-zone-map') return AZMapFile.validate(data).boxes.map(primitive);
+  if (data?.schemaVersion !== 1 || !Array.isArray(data.objects) || data.objects.length > 100 ||
+      (data.boxes !== undefined && !Array.isArray(data.boxes))) throw new Error('JSON phải là bố cục AZONE, cảnh Pascal hoặc file map Gun Zone.');
+  const specs = data.objects.map(d => {
+    const asset = assets.find(a => a.id === d?.assetId);
+    if (!asset || !Array.isArray(d.position) || d.position.length !== 3 ||
+        !d.position.every(v => Number.isFinite(v) && Math.abs(v) <= 1000) ||
+        !Number.isFinite(d.rotationY)) throw new Error('Vị trí hoặc mã mẫu nhà không hợp lệ.');
+    return {asset,d};
+  });
+  const boxes = data.boxes?.length ? AZMapFile.validate({
+    format:'azone-gun-zone-map', version:1, units:'meters', boxes:data.boxes
+  }).boxes : [];
+  const houses = [];
+  for (const {asset,d} of specs) {
+    const obj = normalize(await obtain(asset));
+    obj.userData.assetId = asset.id;
+    obj.position.set(d.position[0],0,d.position[2]);
+    obj.rotation.y = d.rotationY;
+    houses.push(obj);
+  }
+  return [...boxes.map(primitive), ...houses];
+}
+document.getElementById('clear').onclick = () => {
+  if (!instances.length || !confirm('Xóa toàn bộ công trình trong cảnh này?')) return;
+  replaceInstances([]);
+  save();
+  state('Đã dọn bố cục map');
+};
+document.getElementById('export').onclick = () => {
+  download(snapshot(), 'azone-layout.json');
+  state('Đã xuất bố cục editor');
+};
+document.getElementById('exportMap').onclick = () => {
+  try {
+    const data = AZMapFile.validate({format:'azone-gun-zone-map',version:1,units:'meters',boxes:instances.map(objectBox)});
+    download(data, 'azone-map.gunzone.json');
+    state('Đã xuất map Gun Zone · nạp tại màn hình Solo.');
+  } catch (error) {
+    state(error.message);
+  }
+};
+const fileInput = document.getElementById('importFile');
+document.getElementById('importButton').onclick = () => fileInput.click();
+fileInput.onchange = async () => {
+  if (!fileInput.files.length) return;
+  const button = document.getElementById('importButton');
+  button.disabled = true;
+  try {
+    const staged = await stageLayout(await AZMapFile.read(fileInput.files[0]));
+    replaceInstances(staged);
+    save();
+    state('Đã tái tạo '+staged.length+' đối tượng từ JSON.');
+  } catch (error) {
+    state('Lỗi nhập JSON: '+error.message);
+  } finally {
+    fileInput.value = '';
+    button.disabled = false;
+  }
+};
+refreshPlaced();
+(async function startEditor() {
+  const editControls = ['importButton','add','clear','remove','apply'].map(id => document.getElementById(id));
+  editControls.forEach(control => { control.disabled = true; });
+  try {
+    const saved = localStorage.getItem('azone-house-map-v1');
+    if (saved) {
+      replaceInstances(await stageLayout(JSON.parse(saved)));
+      state('Đã khôi phục '+instances.length+' đối tượng từ trình duyệt.');
+    } else await select(0);
+  } catch (error) {
+    state('Không khôi phục được cảnh: '+error.message);
+  } finally {
+    editControls.forEach(control => { control.disabled = false; });
+  }
+})();
+function animate(){requestAnimationFrame(animate);if(renderer){controls.update();renderer.render(scene,camera)}else{drawPlan()}}animate();</script></body></html>
