@@ -36,6 +36,24 @@ lang.write_text(s.replace("LANG === 'en'", "LANG === 'vi'").replace("LANG !== 'e
 menu = Path("src/09e-menus.js")
 menu.write_text("".join(line for line in menu.read_text().splitlines(True) if "['select', 'lang'," not in line))
 replace("src/09n-armurerie.js", "LANG === 'fr' ? 'fr-FR' : 'en-US'", "LOCALE")
+# Make the full arsenal usable at level one while keeping earned XP and loadout validation.
+arsenal = Path("src/06r-arsenal.js")
+source = arsenal.read_text()
+start = source.index("/* ---------- Déblocages ---------- */")
+end = source.index("/* Tout ce que l'arme wid", start)
+source = source[:start] + """/* All valid weapons, attachments and camos are available in this edition. */
+function weaponLock() { return ''; }
+function attLock() { return ''; }
+function camoLock() { return ''; }
+""" + source[end:]
+start = source.index("function arsNextUnlock(")
+end = source.index("\n}", start) + len("\n}")
+source = source[:start] + "function arsNextUnlock() { return null; }" + source[end:]
+arsenal.write_text(source)
+replace(arsenal, "CUSTOM_UNLOCK = [3, 6, 10, 15, 20]", "CUSTOM_UNLOCK = [1, 6, 10, 15, 20]")
+replace("src/09n-armurerie.js",
+        r"${_t('Les camouflages se débloquent avec le niveau de l\u0027arme.')}",
+        "Tất cả kiểu ngụy trang đều có sẵn.")
 game = Path("src/09-game.js")
 game.write_text(re.sub(r"^const ordinal = .*?;$", "const ordinal = (n) => 'hạng ' + n;", game.read_text(), flags=re.M))
 maps = {"Khamsin":"ANH HÙNG THỜI LOẠN","Val-Blanc":"Ga Núi Tuyết","Kervénec":"Cảng Hoàng Hôn","Hortus":"Vườn Bách Thảo","Meltem":"Đảo Gió","Tephra":"Trạm Núi Lửa","Stratus":"Quần Đảo Trên Mây","Simoun":"AZONE Công Thành Chiến","French Dream":"Khu Ngoại Ô"}
