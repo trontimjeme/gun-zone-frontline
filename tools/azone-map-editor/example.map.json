@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "mapId": "italy_real_experiment",
+  "displayName": "ITALY REAL — experimental",
+  "units": "meters",
+  "source": {
+    "editor": "Pascal Editor",
+    "reference": "CS Italy 1.6 SketchUp reference; dimensions pending verification"
+  },
+  "geometry": {
+    "glb": "italy_real.glb",
+    "scaleToMeters": 1
+  },
+  "spawns": [
+    {
+      "id": "t_01",
+      "team": "T",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yawDegrees": 90
+    },
+    {
+      "id": "ct_01",
+      "team": "CT",
+      "position": [
+        5,
+        0,
+        5
+      ],
+      "yawDegrees": 270
+    }
+  ],
+  "collision": {
+    "mode": "generate_from_geometry"
+  },
+  "navigation": {
+    "mode": "pending_manual_review"
+  },
+  "status": "placeholder_not_playable"
+}
