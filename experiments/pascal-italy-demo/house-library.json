@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "title": "AZONE House Assets V0.1",
+  "note": "External CC0 source; keep credit metadata; model network loading still needs browser verification.",
+  "assets": [
+    {
+      "id": "house_simple",
+      "name": "Nhà 1 tầng",
+      "category": "building",
+      "format": "glb",
+      "source": "kayquer/kit-cidade-lowpoly",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "source_url": "https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/casa_simples.glb",
+      "url": "https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/casa_simples.glb",
+      "status": "remote_reference_not_runtime_verified"
+    },
+    {
+      "id": "house_two_story",
+      "name": "Nhà 2 tầng",
+      "category": "building",
+      "format": "glb",
+      "source": "kayquer/kit-cidade-lowpoly",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "source_url": "https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/casa_sobrado.glb",
+      "url": "https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/casa_sobrado.glb",
+      "status": "remote_reference_not_runtime_verified"
+    },
+    {
+      "id": "house_twin",
+      "name": "Nhà liền kề",
+      "category": "building",
+      "format": "glb",
+      "source": "kayquer/kit-cidade-lowpoly",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "source_url": "https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/casas_geminadas.glb",
+      "url": "https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/casas_geminadas.glb",
+      "status": "remote_reference_not_runtime_verified"
+    },
+    {
+      "id": "building_tall",
+      "name": "Nhà cao tầng",
+      "category": "building",
+      "format": "glb",
+      "source": "kayquer/kit-cidade-lowpoly",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "source_url": "https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/predio_alto.glb",
+      "url": "https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/predio_alto.glb",
+      "status": "remote_reference_not_runtime_verified"
+    },
+    {
+      "id": "apartment",
+      "name": "Chung cư",
+      "category": "building",
+      "format": "glb",
+      "source": "kayquer/kit-cidade-lowpoly",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "source_url": "https://github.com/kayquer/kit-cidade-lowpoly/blob/main/models/residencial/predio_apartamentos.glb",
+      "url": "https://cdn.jsdelivr.net/gh/kayquer/kit-cidade-lowpoly@main/models/residencial/predio_apartamentos.glb",
+      "status": "remote_reference_not_runtime_verified"
+    }
+  ]
+}
