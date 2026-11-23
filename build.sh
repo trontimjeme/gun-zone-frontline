@@ -29,3 +29,8 @@ python3 "$root/restore_native_mobile.py"
 cp LICENSE NOTICE.md assets/sfx/credits.json dist/
 mkdir -p "$root/dist"
 cp -R dist/. "$root/dist/"
+if [ -f "$root/experiments/pascal-italy-demo/house-library.html" ]; then
+  mkdir -p "$root/dist/map-editor"
+  cp "$root/experiments/pascal-italy-demo/house-library.html" "$root/dist/map-editor/index.html"
+  cp "$root/experiments/pascal-italy-demo/editor.css" "$root/dist/map-editor/"
+fi
