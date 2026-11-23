@@ -20,6 +20,7 @@ python3 "$root/localize.py"
 python3 "$root/hide_equipment_tutorial.py"
 python3 "$root/italy_real.py"
 python3 "$root/cs_italy_style.py"
+python3 "$root/tools/azone-map-editor/install_game_import.py"
 curl -fsSL --retry 3 https://texas-eta.vercel.app/audio/theme.mp3 -o dist/menu-theme.mp3
 echo '218b40825e8f5a56ed2a65558cd958b2378b45fdf1fa8fa2d5e90082fa207f5b  dist/menu-theme.mp3' | sha256sum -c -
 python3 "$root/restore_native_mobile.py"
@@ -29,3 +30,8 @@ python3 "$root/restore_native_mobile.py"
 cp LICENSE NOTICE.md assets/sfx/credits.json dist/
 mkdir -p "$root/dist"
 cp -R dist/. "$root/dist/"
+if [ -f "$root/experiments/pascal-italy-demo/house-library.html" ]; then
+  mkdir -p "$root/dist/map-editor"
+  cp "$root/experiments/pascal-italy-demo/house-library.html" "$root/dist/map-editor/index.html"
+  cp "$root/experiments/pascal-italy-demo/editor.css" "$root/experiments/pascal-italy-demo/map-format.js" "$root/experiments/pascal-italy-demo/scene.json" "$root/dist/map-editor/"
+fi

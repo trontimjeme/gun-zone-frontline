@@ -1,0 +1,1110 @@
+{
+  "nodes": {
+    "italy_demo_site": {
+      "object": "node",
+      "id": "italy_demo_site",
+      "type": "site",
+      "parentId": null,
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "polygon": {
+        "type": "polygon",
+        "points": [
+          [
+            -25,
+            -24
+          ],
+          [
+            25,
+            -24
+          ],
+          [
+            25,
+            24
+          ],
+          [
+            -25,
+            24
+          ]
+        ]
+      },
+      "children": [
+        "plaza_house",
+        "arch_street_house",
+        "back_alley_house"
+      ]
+    },
+    "plaza_house": {
+      "object": "node",
+      "id": "plaza_house",
+      "type": "building",
+      "parentId": "italy_demo_site",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "plaza_house_ground"
+      ],
+      "position": [
+        -8,
+        0,
+        -6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "name": "plaza house"
+    },
+    "plaza_house_ground": {
+      "object": "node",
+      "id": "plaza_house_ground",
+      "type": "level",
+      "parentId": "plaza_house",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "plaza_house_wall_south",
+        "plaza_house_wall_east",
+        "plaza_house_wall_north",
+        "plaza_house_wall_west",
+        "plaza_house_roof"
+      ],
+      "level": 0,
+      "baseElevation": 0,
+      "height": 3
+    },
+    "plaza_house_wall_south": {
+      "object": "node",
+      "id": "plaza_house_wall_south",
+      "type": "wall",
+      "parentId": "plaza_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "plaza_house_door"
+      ],
+      "start": [
+        -3,
+        -2
+      ],
+      "end": [
+        3,
+        -2
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "plaza_house_door": {
+      "object": "node",
+      "id": "plaza_house_door",
+      "type": "door",
+      "parentId": "plaza_house_wall_south",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        3,
+        1.05,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "floorThresholdVersion": 1,
+      "wallId": "plaza_house_wall_south",
+      "width": 0.9,
+      "height": 2.1,
+      "constructionType": "framed",
+      "dimensionReference": "nominal",
+      "doorCategory": "interior",
+      "doorType": "hinged",
+      "leafCount": 1,
+      "operationState": 0,
+      "slideDirection": "left",
+      "trackStyle": "none",
+      "garagePanelCount": 4,
+      "openingKind": "door",
+      "openingShape": "rectangle",
+      "openingRadiusMode": "all",
+      "openingTopRadii": [
+        0.15,
+        0.15
+      ],
+      "cornerRadius": 0.15,
+      "archHeight": 0.45,
+      "openingRevealRadius": 0.025,
+      "frameThickness": 0.05,
+      "threshold": true,
+      "thresholdHeight": 0.02,
+      "hingesSide": "left",
+      "swingDirection": "inward",
+      "swingAngle": 0,
+      "segments": [
+        {
+          "type": "panel",
+          "heightRatio": 0.4,
+          "columnRatios": [
+            1
+          ],
+          "dividerThickness": 0.03,
+          "panelDepth": 0.01,
+          "panelInset": 0.04
+        },
+        {
+          "type": "panel",
+          "heightRatio": 0.6,
+          "columnRatios": [
+            1
+          ],
+          "dividerThickness": 0.03,
+          "panelDepth": 0.01,
+          "panelInset": 0.04
+        }
+      ],
+      "handle": true,
+      "handleHeight": 1.05,
+      "handleSide": "right",
+      "contentPadding": [
+        0.11,
+        0.11
+      ],
+      "doorCloser": false,
+      "panicBar": false,
+      "panicBarStyle": "crossbar",
+      "panicBarRods": false,
+      "panicBarHeight": 1,
+      "children": []
+    },
+    "plaza_house_wall_east": {
+      "object": "node",
+      "id": "plaza_house_wall_east",
+      "type": "wall",
+      "parentId": "plaza_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "plaza_house_window"
+      ],
+      "start": [
+        3,
+        -2
+      ],
+      "end": [
+        3,
+        2
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "plaza_house_window": {
+      "object": "node",
+      "id": "plaza_house_window",
+      "type": "window",
+      "parentId": "plaza_house_wall_east",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        2,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "floorThresholdVersion": 1,
+      "wallId": "plaza_house_wall_east",
+      "width": 1.5,
+      "height": 1.5,
+      "constructionType": "framed",
+      "dimensionReference": "nominal",
+      "openingKind": "window",
+      "windowType": "fixed",
+      "operationState": 0,
+      "awningDirection": "up",
+      "casementStyle": "single",
+      "hingesSide": "left",
+      "openingShape": "rectangle",
+      "openingRadiusMode": "all",
+      "openingCornerRadii": [
+        0.15,
+        0.15,
+        0.15,
+        0.15
+      ],
+      "cornerRadius": 0.15,
+      "archHeight": 0.35,
+      "openingRevealRadius": 0.025,
+      "frameThickness": 0.05,
+      "columnRatios": [
+        1
+      ],
+      "rowRatios": [
+        1
+      ],
+      "columnDividerThickness": 0.03,
+      "rowDividerThickness": 0.03,
+      "sill": true,
+      "sillDepth": 0.08,
+      "sillThickness": 0.03,
+      "children": []
+    },
+    "plaza_house_wall_north": {
+      "object": "node",
+      "id": "plaza_house_wall_north",
+      "type": "wall",
+      "parentId": "plaza_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [],
+      "start": [
+        3,
+        2
+      ],
+      "end": [
+        -3,
+        2
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "plaza_house_wall_west": {
+      "object": "node",
+      "id": "plaza_house_wall_west",
+      "type": "wall",
+      "parentId": "plaza_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [],
+      "start": [
+        -3,
+        2
+      ],
+      "end": [
+        -3,
+        -2
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "plaza_house_roof": {
+      "object": "node",
+      "id": "plaza_house_roof",
+      "type": "roof",
+      "parentId": "plaza_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        0,
+        2.7,
+        0
+      ],
+      "rotation": 0,
+      "support": {
+        "kind": "level"
+      },
+      "children": [
+        "plaza_house_roof_segment"
+      ]
+    },
+    "plaza_house_roof_segment": {
+      "object": "node",
+      "id": "plaza_house_roof_segment",
+      "type": "roof-segment",
+      "parentId": "plaza_house_roof",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": 0,
+      "roofType": "gable",
+      "width": 6,
+      "depth": 4,
+      "trim": {
+        "left": 0,
+        "right": 0,
+        "front": 0,
+        "back": 0,
+        "frontLeft": 0,
+        "frontRight": 0,
+        "backLeft": 0,
+        "backRight": 0,
+        "frontLeftX": 0,
+        "frontLeftZ": 0,
+        "frontRightX": 0,
+        "frontRightZ": 0,
+        "backLeftX": 0,
+        "backLeftZ": 0,
+        "backRightX": 0,
+        "backRightZ": 0
+      },
+      "wallHeight": 0,
+      "pitch": 28,
+      "wallThickness": 0.1,
+      "deckThickness": 0.1,
+      "overhang": 0.3,
+      "shingleThickness": 0.05,
+      "managedByParent": false,
+      "wallShell": "auto",
+      "shedInsetEndPanels": false,
+      "gambrelLowerWidthRatio": 0.5,
+      "gambrelLowerHeightRatio": 0.6,
+      "mansardSteepWidthRatio": 0.15,
+      "mansardSteepHeightRatio": 0.7,
+      "dutchHipWidthRatio": 0.25,
+      "dutchHipHeightRatio": 0.5,
+      "dutchWaistLengthRatio": 0.98,
+      "dutchGabletRake": 0.48,
+      "dutchTopRakeThickness": 0.21,
+      "children": [],
+      "topMaterialPreset": "scene:terracotta"
+    },
+    "arch_street_house": {
+      "object": "node",
+      "id": "arch_street_house",
+      "type": "building",
+      "parentId": "italy_demo_site",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "arch_street_house_ground"
+      ],
+      "position": [
+        7,
+        0,
+        -5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "name": "arch street house"
+    },
+    "arch_street_house_ground": {
+      "object": "node",
+      "id": "arch_street_house_ground",
+      "type": "level",
+      "parentId": "arch_street_house",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "arch_street_house_wall_south",
+        "arch_street_house_wall_east",
+        "arch_street_house_wall_north",
+        "arch_street_house_wall_west",
+        "arch_street_house_roof"
+      ],
+      "level": 0,
+      "baseElevation": 0,
+      "height": 3.4
+    },
+    "arch_street_house_wall_south": {
+      "object": "node",
+      "id": "arch_street_house_wall_south",
+      "type": "wall",
+      "parentId": "arch_street_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "arch_street_house_door"
+      ],
+      "start": [
+        -3,
+        -2
+      ],
+      "end": [
+        3,
+        -2
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "arch_street_house_door": {
+      "object": "node",
+      "id": "arch_street_house_door",
+      "type": "door",
+      "parentId": "arch_street_house_wall_south",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        3,
+        1.05,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "floorThresholdVersion": 1,
+      "wallId": "arch_street_house_wall_south",
+      "width": 0.9,
+      "height": 2.1,
+      "constructionType": "framed",
+      "dimensionReference": "nominal",
+      "doorCategory": "interior",
+      "doorType": "hinged",
+      "leafCount": 1,
+      "operationState": 0,
+      "slideDirection": "left",
+      "trackStyle": "none",
+      "garagePanelCount": 4,
+      "openingKind": "door",
+      "openingShape": "rectangle",
+      "openingRadiusMode": "all",
+      "openingTopRadii": [
+        0.15,
+        0.15
+      ],
+      "cornerRadius": 0.15,
+      "archHeight": 0.45,
+      "openingRevealRadius": 0.025,
+      "frameThickness": 0.05,
+      "threshold": true,
+      "thresholdHeight": 0.02,
+      "hingesSide": "left",
+      "swingDirection": "inward",
+      "swingAngle": 0,
+      "segments": [
+        {
+          "type": "panel",
+          "heightRatio": 0.4,
+          "columnRatios": [
+            1
+          ],
+          "dividerThickness": 0.03,
+          "panelDepth": 0.01,
+          "panelInset": 0.04
+        },
+        {
+          "type": "panel",
+          "heightRatio": 0.6,
+          "columnRatios": [
+            1
+          ],
+          "dividerThickness": 0.03,
+          "panelDepth": 0.01,
+          "panelInset": 0.04
+        }
+      ],
+      "handle": true,
+      "handleHeight": 1.05,
+      "handleSide": "right",
+      "contentPadding": [
+        0.11,
+        0.11
+      ],
+      "doorCloser": false,
+      "panicBar": false,
+      "panicBarStyle": "crossbar",
+      "panicBarRods": false,
+      "panicBarHeight": 1,
+      "children": []
+    },
+    "arch_street_house_wall_east": {
+      "object": "node",
+      "id": "arch_street_house_wall_east",
+      "type": "wall",
+      "parentId": "arch_street_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "arch_street_house_window"
+      ],
+      "start": [
+        3,
+        -2
+      ],
+      "end": [
+        3,
+        2
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "arch_street_house_window": {
+      "object": "node",
+      "id": "arch_street_house_window",
+      "type": "window",
+      "parentId": "arch_street_house_wall_east",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        2,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "floorThresholdVersion": 1,
+      "wallId": "arch_street_house_wall_east",
+      "width": 1.5,
+      "height": 1.5,
+      "constructionType": "framed",
+      "dimensionReference": "nominal",
+      "openingKind": "window",
+      "windowType": "fixed",
+      "operationState": 0,
+      "awningDirection": "up",
+      "casementStyle": "single",
+      "hingesSide": "left",
+      "openingShape": "rectangle",
+      "openingRadiusMode": "all",
+      "openingCornerRadii": [
+        0.15,
+        0.15,
+        0.15,
+        0.15
+      ],
+      "cornerRadius": 0.15,
+      "archHeight": 0.35,
+      "openingRevealRadius": 0.025,
+      "frameThickness": 0.05,
+      "columnRatios": [
+        1
+      ],
+      "rowRatios": [
+        1
+      ],
+      "columnDividerThickness": 0.03,
+      "rowDividerThickness": 0.03,
+      "sill": true,
+      "sillDepth": 0.08,
+      "sillThickness": 0.03,
+      "children": []
+    },
+    "arch_street_house_wall_north": {
+      "object": "node",
+      "id": "arch_street_house_wall_north",
+      "type": "wall",
+      "parentId": "arch_street_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [],
+      "start": [
+        3,
+        2
+      ],
+      "end": [
+        -3,
+        2
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "arch_street_house_wall_west": {
+      "object": "node",
+      "id": "arch_street_house_wall_west",
+      "type": "wall",
+      "parentId": "arch_street_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [],
+      "start": [
+        -3,
+        2
+      ],
+      "end": [
+        -3,
+        -2
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "arch_street_house_roof": {
+      "object": "node",
+      "id": "arch_street_house_roof",
+      "type": "roof",
+      "parentId": "arch_street_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        0,
+        3.1,
+        0
+      ],
+      "rotation": 0,
+      "support": {
+        "kind": "level"
+      },
+      "children": [
+        "arch_street_house_roof_segment"
+      ]
+    },
+    "arch_street_house_roof_segment": {
+      "object": "node",
+      "id": "arch_street_house_roof_segment",
+      "type": "roof-segment",
+      "parentId": "arch_street_house_roof",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": 0,
+      "roofType": "gable",
+      "width": 6,
+      "depth": 4,
+      "trim": {
+        "left": 0,
+        "right": 0,
+        "front": 0,
+        "back": 0,
+        "frontLeft": 0,
+        "frontRight": 0,
+        "backLeft": 0,
+        "backRight": 0,
+        "frontLeftX": 0,
+        "frontLeftZ": 0,
+        "frontRightX": 0,
+        "frontRightZ": 0,
+        "backLeftX": 0,
+        "backLeftZ": 0,
+        "backRightX": 0,
+        "backRightZ": 0
+      },
+      "wallHeight": 0,
+      "pitch": 28,
+      "wallThickness": 0.1,
+      "deckThickness": 0.1,
+      "overhang": 0.3,
+      "shingleThickness": 0.05,
+      "managedByParent": false,
+      "wallShell": "auto",
+      "shedInsetEndPanels": false,
+      "gambrelLowerWidthRatio": 0.5,
+      "gambrelLowerHeightRatio": 0.6,
+      "mansardSteepWidthRatio": 0.15,
+      "mansardSteepHeightRatio": 0.7,
+      "dutchHipWidthRatio": 0.25,
+      "dutchHipHeightRatio": 0.5,
+      "dutchWaistLengthRatio": 0.98,
+      "dutchGabletRake": 0.48,
+      "dutchTopRakeThickness": 0.21,
+      "children": [],
+      "topMaterialPreset": "scene:terracotta"
+    },
+    "back_alley_house": {
+      "object": "node",
+      "id": "back_alley_house",
+      "type": "building",
+      "parentId": "italy_demo_site",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "back_alley_house_ground"
+      ],
+      "position": [
+        0,
+        0,
+        10
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "name": "back alley house"
+    },
+    "back_alley_house_ground": {
+      "object": "node",
+      "id": "back_alley_house_ground",
+      "type": "level",
+      "parentId": "back_alley_house",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "back_alley_house_wall_south",
+        "back_alley_house_wall_east",
+        "back_alley_house_wall_north",
+        "back_alley_house_wall_west",
+        "back_alley_house_roof"
+      ],
+      "level": 0,
+      "baseElevation": 0,
+      "height": 3.2
+    },
+    "back_alley_house_wall_south": {
+      "object": "node",
+      "id": "back_alley_house_wall_south",
+      "type": "wall",
+      "parentId": "back_alley_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "back_alley_house_door"
+      ],
+      "start": [
+        -2.5,
+        -2.5
+      ],
+      "end": [
+        2.5,
+        -2.5
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "back_alley_house_door": {
+      "object": "node",
+      "id": "back_alley_house_door",
+      "type": "door",
+      "parentId": "back_alley_house_wall_south",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        2.5,
+        1.05,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "floorThresholdVersion": 1,
+      "wallId": "back_alley_house_wall_south",
+      "width": 0.9,
+      "height": 2.1,
+      "constructionType": "framed",
+      "dimensionReference": "nominal",
+      "doorCategory": "interior",
+      "doorType": "hinged",
+      "leafCount": 1,
+      "operationState": 0,
+      "slideDirection": "left",
+      "trackStyle": "none",
+      "garagePanelCount": 4,
+      "openingKind": "door",
+      "openingShape": "rectangle",
+      "openingRadiusMode": "all",
+      "openingTopRadii": [
+        0.15,
+        0.15
+      ],
+      "cornerRadius": 0.15,
+      "archHeight": 0.45,
+      "openingRevealRadius": 0.025,
+      "frameThickness": 0.05,
+      "threshold": true,
+      "thresholdHeight": 0.02,
+      "hingesSide": "left",
+      "swingDirection": "inward",
+      "swingAngle": 0,
+      "segments": [
+        {
+          "type": "panel",
+          "heightRatio": 0.4,
+          "columnRatios": [
+            1
+          ],
+          "dividerThickness": 0.03,
+          "panelDepth": 0.01,
+          "panelInset": 0.04
+        },
+        {
+          "type": "panel",
+          "heightRatio": 0.6,
+          "columnRatios": [
+            1
+          ],
+          "dividerThickness": 0.03,
+          "panelDepth": 0.01,
+          "panelInset": 0.04
+        }
+      ],
+      "handle": true,
+      "handleHeight": 1.05,
+      "handleSide": "right",
+      "contentPadding": [
+        0.11,
+        0.11
+      ],
+      "doorCloser": false,
+      "panicBar": false,
+      "panicBarStyle": "crossbar",
+      "panicBarRods": false,
+      "panicBarHeight": 1,
+      "children": []
+    },
+    "back_alley_house_wall_east": {
+      "object": "node",
+      "id": "back_alley_house_wall_east",
+      "type": "wall",
+      "parentId": "back_alley_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [
+        "back_alley_house_window"
+      ],
+      "start": [
+        2.5,
+        -2.5
+      ],
+      "end": [
+        2.5,
+        2.5
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "back_alley_house_window": {
+      "object": "node",
+      "id": "back_alley_house_window",
+      "type": "window",
+      "parentId": "back_alley_house_wall_east",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        2.5,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "floorThresholdVersion": 1,
+      "wallId": "back_alley_house_wall_east",
+      "width": 1.5,
+      "height": 1.5,
+      "constructionType": "framed",
+      "dimensionReference": "nominal",
+      "openingKind": "window",
+      "windowType": "fixed",
+      "operationState": 0,
+      "awningDirection": "up",
+      "casementStyle": "single",
+      "hingesSide": "left",
+      "openingShape": "rectangle",
+      "openingRadiusMode": "all",
+      "openingCornerRadii": [
+        0.15,
+        0.15,
+        0.15,
+        0.15
+      ],
+      "cornerRadius": 0.15,
+      "archHeight": 0.35,
+      "openingRevealRadius": 0.025,
+      "frameThickness": 0.05,
+      "columnRatios": [
+        1
+      ],
+      "rowRatios": [
+        1
+      ],
+      "columnDividerThickness": 0.03,
+      "rowDividerThickness": 0.03,
+      "sill": true,
+      "sillDepth": 0.08,
+      "sillThickness": 0.03,
+      "children": []
+    },
+    "back_alley_house_wall_north": {
+      "object": "node",
+      "id": "back_alley_house_wall_north",
+      "type": "wall",
+      "parentId": "back_alley_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [],
+      "start": [
+        2.5,
+        2.5
+      ],
+      "end": [
+        -2.5,
+        2.5
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "back_alley_house_wall_west": {
+      "object": "node",
+      "id": "back_alley_house_wall_west",
+      "type": "wall",
+      "parentId": "back_alley_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "children": [],
+      "start": [
+        -2.5,
+        2.5
+      ],
+      "end": [
+        -2.5,
+        -2.5
+      ],
+      "frontSide": "unknown",
+      "backSide": "unknown"
+    },
+    "back_alley_house_roof": {
+      "object": "node",
+      "id": "back_alley_house_roof",
+      "type": "roof",
+      "parentId": "back_alley_house_ground",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        0,
+        2.9000000000000004,
+        0
+      ],
+      "rotation": 0,
+      "support": {
+        "kind": "level"
+      },
+      "children": [
+        "back_alley_house_roof_segment"
+      ]
+    },
+    "back_alley_house_roof_segment": {
+      "object": "node",
+      "id": "back_alley_house_roof_segment",
+      "type": "roof-segment",
+      "parentId": "back_alley_house_roof",
+      "visible": true,
+      "metadata": {
+        "azoneDemo": true
+      },
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": 0,
+      "roofType": "gable",
+      "width": 5,
+      "depth": 5,
+      "trim": {
+        "left": 0,
+        "right": 0,
+        "front": 0,
+        "back": 0,
+        "frontLeft": 0,
+        "frontRight": 0,
+        "backLeft": 0,
+        "backRight": 0,
+        "frontLeftX": 0,
+        "frontLeftZ": 0,
+        "frontRightX": 0,
+        "frontRightZ": 0,
+        "backLeftX": 0,
+        "backLeftZ": 0,
+        "backRightX": 0,
+        "backRightZ": 0
+      },
+      "wallHeight": 0,
+      "pitch": 28,
+      "wallThickness": 0.1,
+      "deckThickness": 0.1,
+      "overhang": 0.3,
+      "shingleThickness": 0.05,
+      "managedByParent": false,
+      "wallShell": "auto",
+      "shedInsetEndPanels": false,
+      "gambrelLowerWidthRatio": 0.5,
+      "gambrelLowerHeightRatio": 0.6,
+      "mansardSteepWidthRatio": 0.15,
+      "mansardSteepHeightRatio": 0.7,
+      "dutchHipWidthRatio": 0.25,
+      "dutchHipHeightRatio": 0.5,
+      "dutchWaistLengthRatio": 0.98,
+      "dutchGabletRake": 0.48,
+      "dutchTopRakeThickness": 0.21,
+      "children": [],
+      "topMaterialPreset": "scene:terracotta"
+    }
+  },
+  "rootNodeIds": [
+    "italy_demo_site"
+  ],
+  "materials": {
+    "terracotta": {
+      "id": "terracotta",
+      "name": "Italy terracotta roof",
+      "material": {
+        "properties": {
+          "color": "#a44e31",
+          "roughness": 0.85
+        }
+      }
+    }
+  },
+  "collections": {},
+  "installedPlugins": []
+}

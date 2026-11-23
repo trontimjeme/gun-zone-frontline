@@ -1,0 +1,37 @@
+name: AZONE map manifest validation
+
+on:
+  pull_request:
+    paths:
+      - 'tools/azone-map-editor/**'
+      - '.github/workflows/azone-map-manifest.yml'
+  push:
+    branches:
+      - 'feature/pascal-map-editor-integration'
+    paths:
+      - 'tools/azone-map-editor/**'
+      - '.github/workflows/azone-map-manifest.yml'
+
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate example map manifest
+        run: python3 tools/azone-map-editor/validate_map.py tools/azone-map-editor/example.map.json
+      - name: Reject invalid coordinate values
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p = Path('tools/azone-map-editor/validate_map.py')
+          spec = importlib.util.spec_from_file_location('validate_map', p)
+          mod = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(mod)
+          assert mod.validate({
+              'schemaVersion':1, 'mapId':'italy_real', 'units':'meters',
+              'geometry':{'glb':'../../unsafe.glb', 'scaleToMeters': 1},
+              'spawns':[{'id':'t_01','team':'T','position':[float('nan'),0,0],'yawDegrees':0}]
+          })
+          print('Invalid payload rejected')
+          PY
