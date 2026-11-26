@@ -21,6 +21,7 @@ python3 "$root/hide_equipment_tutorial.py"
 python3 "$root/italy_real.py"
 python3 "$root/cs_italy_style.py"
 python3 "$root/pulse_h03.py"
+python3 "$root/truong8x.py"
 curl -fsSL --retry 3 https://texas-eta.vercel.app/audio/theme.mp3 -o dist/menu-theme.mp3
 echo '218b40825e8f5a56ed2a65558cd958b2378b45fdf1fa8fa2d5e90082fa207f5b  dist/menu-theme.mp3' | sha256sum -c -
 python3 "$root/restore_native_mobile.py"
