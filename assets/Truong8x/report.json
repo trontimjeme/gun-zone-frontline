@@ -1,0 +1,116 @@
+{
+  "instances": 2297,
+  "mesh_batches": 17,
+  "triangles_input": 112128,
+  "triangles_output": 112128,
+  "collision_boxes": 30116,
+  "bounds_min": [
+    -45.0,
+    -0.49999996519999995,
+    -27.999991599999994
+  ],
+  "bounds_max": [
+    45.0000232,
+    16.390000519399997,
+    27.0
+  ],
+  "vertices": 200962,
+  "runtime_tested": false,
+  "collision": "approximate AABBs; slopes and openings require gameplay verification",
+  "spawn_checks": [
+    {
+      "team": "CT",
+      "position": [
+        -42.8,
+        -0.25,
+        4
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "CT",
+      "position": [
+        -42.8,
+        -0.25,
+        2
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "CT",
+      "position": [
+        -42.8,
+        -0.25,
+        0
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "CT",
+      "position": [
+        -42.8,
+        -0.25,
+        -2
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "CT",
+      "position": [
+        -42.8,
+        -0.25,
+        -4
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "T",
+      "position": [
+        42.8,
+        -0.25,
+        4
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "T",
+      "position": [
+        42.8,
+        -0.25,
+        2
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "T",
+      "position": [
+        42.8,
+        -0.25,
+        0
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "T",
+      "position": [
+        42.8,
+        -0.25,
+        -2
+      ],
+      "blocking_boxes": 0
+    },
+    {
+      "team": "T",
+      "position": [
+        42.8,
+        -0.25,
+        -4
+      ],
+      "blocking_boxes": 0
+    }
+  ],
+  "previous_meshes": 2297,
+  "previous_collision_boxes": 64404,
+  "previous_json_bytes": 13026924,
+  "new_json_bytes": 11157436
+}
