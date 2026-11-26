@@ -17,6 +17,72 @@ for key, pos, uv, indices in meshes:
 assert all(len(b)==6 and all(math.isfinite(x) for x in b) and b[0]<b[1] and b[2]<b[3] and b[4]<b[5] for b in boxes)
 assert len(teams["CT"]) == len(teams["T"]) == 5
 dest.mkdir(parents=True, exist_ok=True)
+# Source DAE contains two named closed entry leaves (south_gf12/north_gf12).
+# Their frames, walls, windows, and glass are separate assets. Remove leaves,
+# central split and handles; notch the continuous plinth at the same openings.
+door_centers = (16.75, -17.75)
+door_mats = {"textures/italy_aged_wood.png","textures/italy_iron_dark.png","textures/italy_limestone_trim.png"}
+def in_leaf(p,z):
+    return -1.102 <= p[0] <= 1.102 and -.002 <= p[1] <= 3.902 and abs(p[2]-z) <= .072
+removed_tri = 0
+clipped_tri = 0
+def clip_x(poly, x, sign):
+    out = []
+    for a,b in zip(poly,poly[1:]+poly[:1]):
+        fa,fb = sign*(a[0]-x),sign*(b[0]-x)
+        if fa>=0: out.append(a)
+        if (fa>=0)!=(fb>=0):
+            t=fa/(fa-fb)
+            out.append([v+(w-v)*t for v,w in zip(a,b)])
+    return out
+for row in meshes:
+    key,pos,uv,ind=row
+    out=[]
+    for i in range(0,len(ind),3):
+        tri=ind[i:i+3]
+        pts=[pos[j] for j in tri]
+        if key in door_mats and any(all(in_leaf(p,z) for p in pts) for z in door_centers):
+            removed_tri+=1
+            continue
+        if key=="textures/italy_stone_blocks.png" and any(all(-.301<=p[1]<=.701 and z0-.001<=p[2]<=z1+.001 for p in pts) for z0,z1 in ((17,17.1),(-18.1,-18))) and min(p[0] for p in pts)<1.1 and max(p[0] for p in pts)>-1.1:
+            clipped_tri+=1
+            poly=[pos[j]+uv[j] for j in tri]
+            for x,sign in ((-1.1,-1),(1.1,1)):
+                q=clip_x(poly,x,sign)
+                if len(q)<3: continue
+                start=len(pos)
+                for v in q: pos.append(v[:3]);uv.append(v[3:])
+                for k in range(1,len(q)-1): out.extend([start,start+k,start+k+1])
+            continue
+        out.extend(tri)
+    row[3]=out
+assert removed_tri==400 and clipped_tri==40, (removed_tri,clipped_tri)
+# Add small caps to the newly cut stone ends.
+stone=next(row for row in meshes if row[0]=="textures/italy_stone_blocks.png")
+for z0,z1 in ((17,17.1),(-18.1,-18)):
+    for x in (-1.1,1.1):
+        n=len(stone[1]);stone[1].extend([[x,-.3,z0],[x,.7,z0],[x,.7,z1],[x,-.3,z1]])
+        stone[2].extend([[0,0],[0,1],[.1,1],[.1,0]])
+        stone[3].extend([n,n+1,n+2,n,n+2,n+3])
+new_boxes=[]
+removed_boxes=0
+notches=0
+for b in boxes:
+    if any(b[0]>=-1.132 and b[1]<=1.132 and b[2]>=-.031 and b[3]<=3.931 and b[4]>=z-.103 and b[5]<=z+.103 for z in door_centers):
+        removed_boxes+=1
+        continue
+    if b[0]<-39 and b[1]>39 and abs(b[2]+.3)<.001 and abs(b[3]-.7)<.001 and any(abs(b[4]-z0)<.001 and abs(b[5]-z1)<.001 for z0,z1 in ((17,17.1),(-18.1,-18))):
+        new_boxes.extend([[b[0],-1.1,*b[2:]],[1.1,b[1],*b[2:]]])
+        notches+=1
+        continue
+    new_boxes.append(b)
+assert removed_boxes==34 and notches==2, (removed_boxes,notches)
+boxes=new_boxes
+# A standing player must have clearance through both entrance centers.
+for z in door_centers:
+    assert not any(b[1]>-.4 and b[0]<.4 and b[3]>.15 and b[2]<1.8 and b[5]>z-.5 and b[4]<z+.5 for b in boxes), "Entrance still blocked"
+print(f"Truong8x: opened both main doors, removed {removed_tri} door triangles and {removed_boxes} blocking boxes; cut {notches} plinths.")
+
 # Weld glass vertices at UV seams and split into disconnected clusters.
 _, gp, guv, gi = next(row for row in meshes if row[0] == "textures/italy_blue_glass.png")
 parent = list(range(len(gp)))
@@ -106,7 +172,42 @@ function truong8xResetGlass(){
   for(const p of g.panes){p.broken=false;for(const c of p.colliders){c.noRay=false;c.ray=false;c.azGlassBroken=false;}}
   truong8xDrawGlass();
 }
+let truong8xSpawnFloors=null;
+function truong8xBuildSpawnFloors(){
+  const sizes=new Map();
+  for(let i=0;i<NAV.count;i++)sizes.set(NAV.comp[i],(sizes.get(NAV.comp[i])||0)+1);
+  truong8xSpawnFloors=[[],[],[]];
+  for(let i=0;i<NAV.count;i++){
+    const x=NAV.nx[i],y=NAV.ny[i],z=NAV.nz[i];
+    if(Math.abs(x)>39||z< -17||z>16||sizes.get(NAV.comp[i])<20)continue;
+    const f=Math.abs(y)<.25?0:Math.abs(y-4.5)<.25?1:Math.abs(y-8.5)<.25?2:-1;
+    if(f>=0&&NAV.adjStart[i+1]-NAV.adjStart[i]>=2)truong8xSpawnFloors[f].push(i);
+  }
+  console.info('Truong8x spawn floor nodes',truong8xSpawnFloors.map(a=>a.length));
+}
+function truong8xRandomSpawn(e){
+  if(!truong8xSpawnFloors)return null;
+  const ctx=spawnCtx(e),team=spawnBase(e.team);
+  const floors=truong8xSpawnFloors.filter(a=>a.length);
+  // Randomize floor first rather than favoring the floor with the most nodes.
+  for(let pass=0;pass<2;pass++){
+    const order=floors.slice();
+    for(let k=order.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[order[j],order[k]]=[order[k],order[j]];}
+    for(const floor of order){
+      for(let k=0;k<Math.min(80,floor.length*2);k++){
+        const i=floor[Math.floor(Math.random()*floor.length)],x=NAV.nx[i],y=NAV.ny[i],z=NAV.nz[i];
+        if(MATCH.mode!=='ffa'&&(team===0?x> -2:x<2))continue;
+        if(entities.some(o=>o!==e&&o.alive&&!o.off&&Math.abs(o.pos.y-y)<1.8&&Math.hypot(o.pos.x-x,o.pos.z-z)<2))continue;
+        if(ctx.foes.some(o=>Math.abs(o.pos.y-y)<2.5&&Math.hypot(o.pos.x-x,o.pos.z-z)<6))continue;
+        if(!pass&&spawnSeen(ctx,x,z,y))continue;
+        return new V3(x,y,z);
+      }
+    }
+  }
+  return null;
+}
 function truong8xPlaceTeams(){
+  truong8xBuildSpawnFloors();
   for(let team=0;team<2;team++){
     const slots=[];
     const bases=truong8xBases[team];
@@ -179,6 +280,14 @@ patch("src/09e-menus.js","(m.id==='csdrone'?'CS DRONE':'CS ITALY')","(m.id==='tr
 patch("src/02-map.js","_qarr.push(COL[i]);","if(!COL[i].azGlassBroken)_qarr.push(COL[i]);")
 patch("src/07-bots.js","impactFx(end, wn, wm, def.fam === 'sniper');","if(wm==='glass'&&CURMAP.id==='truong8x')truong8xBreakAt(end,shooter);\n    impactFx(end, wn, wm, def.fam === 'sniper');")
 patch("src/09c-net.js","} else if (ev.k === 'prop') {","} else if (ev.k === 'azglass') {\n    if(CURMAP.id==='truong8x'&&e.alive)truong8xBreakPane(ev.pane);\n  } else if (ev.k === 'prop') {")
-patch("src/09a-loading.js","function mapUnload() {","function mapUnload() {\n  truong8xGlass=null;")
+patch("src/09a-loading.js","function mapUnload() {","function mapUnload() {\n  truong8xGlass=null;truong8xSpawnFloors=null;")
 patch("src/09-game.js","function startMatch(opt = {}) {","function startMatch(opt = {}) {\n  if(CURMAP.id==='truong8x')truong8xResetGlass();")
-print("Truong8x: validated 17 mesh batches, 30116 collision boxes, 10 source spawns; installed Italy HDRI and breakable glass.")
+
+# Force the CPU/GPU text overlay off globally without touching dynamic resolution.
+p=Path("shell.html")
+p.write_text(p.read_text().replace("</style>","#perf{display:none!important}</style>",1))
+patch("src/09-game.js","if (Settings.perf) updatePerfHud();","if (false) updatePerfHud();")
+patch("src/09zo-perfs.js","PFR.on = !!Settings.perf;","PFR.on = false;")
+patch("src/09i-modes.js","function chooseSpawn(e) {","function chooseSpawn(e) {\n  if(CURMAP.id==='truong8x'){const p=truong8xRandomSpawn(e);if(p)return p;}")
+
+print("Truong8x: installed open entrances, multi-floor random spawns, Italy HDRI, breakable glass and hidden performance HUD.")
