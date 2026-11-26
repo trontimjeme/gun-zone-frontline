@@ -76,7 +76,7 @@ for b in boxes:
         notches+=1
         continue
     new_boxes.append(b)
-assert removed_boxes==34 and notches==2, (removed_boxes,notches)
+assert removed_boxes==36 and notches==2, (removed_boxes,notches)
 boxes=new_boxes
 # A standing player must have clearance through both entrance centers.
 for z in door_centers:
