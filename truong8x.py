@@ -92,7 +92,11 @@ for b in boxes:
 boxes=[list(b) for b in dict.fromkeys(tuple(round(v,4) for v in b) for b in boxes)]
 hx=(hi[0]-lo[0])/2;hz=(hi[2]-lo[2])/2
 assert hx>2 and hz>2
+hx=math.ceil(hx)
+hz=math.ceil(hz)
 bounds={"x0":-hx-1,"x1":hx+1,"z0":-hz-1,"z1":hz+1}
+assert all(isinstance(v,int) for v in bounds.values())
+assert (2*hx+2)*(2*hz+2)<250000, 'Map navigation grid too large'
 teams={t:[[sign*hx*.7,0,hz*f] for f in (-.4,-.2,0,.2,.4)] for t,sign in (("CT",-1),("T",1))}
 (dest/"map.json").write_text(json.dumps([meshes,boxes,[]],separators=(",",":")))
 (dest/"spawn_points.json").write_text(json.dumps({"teams":teams}))
