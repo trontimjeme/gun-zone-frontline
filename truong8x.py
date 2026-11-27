@@ -17,13 +17,19 @@ I=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
 scale=float(q(root,"c:asset/c:unit").get("meter"))
 assert q(root,"c:asset/c:up_axis").text.strip()=="Z_UP"
 materials={}
+italy=source.parent/"Truong8x"/"textures"
+mapping={"rc_concrete":"italy_plaster_cream","stucco_cream":"italy_plaster_cream","fiber_cement_panel":"italy_stone_blocks","stucco_grey":"italy_ochre_plaster","frame":"italy_iron_dark","glass":"italy_blue_glass","metal_balustrade":"italy_iron_dark","ceramic_flat_tile_dark":"italy_interior_tile","tile_joint":"italy_iron_dark","wood_pattern_ceiling":"italy_aged_wood","wood_door":"italy_aged_wood","stone_border":"italy_limestone_trim","soil":"italy_earth","green_light":"italy_grass","planter_green":"italy_grass","material":"italy_cobblestone","Brick_Tumbled":"italy_stone_blocks"}
 for m in qa(root,"c:library_materials/c:material"):
     fx=ref(q(m,"c:instance_effect").get("url"))
     d=q(fx,".//c:diffuse")
     color=q(d,"c:color")
     tex=q(d,"c:texture")
     key="textures/"+m.get("id")+".png"
-    if tex is not None:
+    name=m.get("name","").split("1770e7_")[-1]
+    if name in mapping:
+        key="textures/"+mapping[name]+".png"
+        shutil.copy2(italy/Path(key).name,dest/key)
+    elif tex is not None:
         key="textures/Brick_Tumbled.jpg"
         shutil.copy2(source/"Brick_Tumbled.jpg",dest/key)
     else:
@@ -32,6 +38,8 @@ for m in qa(root,"c:library_materials/c:material"):
     materials[m.get("id")]=key
 meshes_by_key={}
 boxes=[]
+glass_triangles=[]
+glass_key='textures/italy_blue_glass.png'
 def array(s):
     a=q(s,"c:float_array"); ac=q(s,"c:technique_common/c:accessor")
     v=list(map(float,a.text.split())); stride=int(ac.get("stride","1")); off=int(ac.get("offset","0"))
@@ -69,12 +77,18 @@ def walk(node,parent,depth=0):
                     pts.append(p)
                     row[3].append(len(row[1]));row[1].append(p)
                     row[2].append(uv[idx[j+uo]][:2] if uv is not None else [p[0],p[2]])
+                # World-space planar UVs for Italy materials, independent of source UV scale.
+                normal=[abs((pts[1][(a+1)%3]-pts[0][(a+1)%3])*(pts[2][(a+2)%3]-pts[0][(a+2)%3])-(pts[1][(a+2)%3]-pts[0][(a+2)%3])*(pts[2][(a+1)%3]-pts[0][(a+1)%3])) for a in range(3)]
+                axis=max(range(3),key=lambda a:normal[a])
+                axes=[a for a in range(3) if a!=axis]
+                row[2][-3:]=[[p[axes[0]]/2,p[axes[1]]/2] for p in pts]
                 lo=[min(p[a] for p in pts) for a in range(3)]
                 hi=[max(p[a] for p in pts) for a in range(3)]
                 # Axis-aligned surfaces become thin colliders; sloped surfaces use
                 # triangle bounding boxes, which are conservative approximations.
                 if sum((hi[a]-lo[a])>.001 for a in range(3))>=2:
                     boxes.append([v for a in range(3) for v in (lo[a]-.015,hi[a]+.015)])
+                    if key==glass_key:glass_triangles.append((row[3][-3:],len(boxes)-1))
     for child in qa(node,"c:node"):walk(child,world,depth+1)
     for inst in qa(node,"c:instance_node"):walk(ref(inst.get("url")),world,depth+1)
 scene=ref(q(root,"c:scene/c:instance_visual_scene").get("url"))
@@ -89,7 +103,27 @@ for p in points:p[0]-=cx;p[2]-=cz
 for b in boxes:
     b[0]-=cx;b[1]-=cx;b[4]-=cz;b[5]-=cz
 # Deduplicate identical collider bounds.
-boxes=[list(b) for b in dict.fromkeys(tuple(round(v,4) for v in b) for b in boxes)]
+# Keep glass collider indices stable. Weld glass triangles at shared vertices.
+panes=[]
+if glass_triangles:
+    gp=meshes_by_key[glass_key][1]
+    parents=list(range(len(glass_triangles)))
+    def find(i):
+        while parents[i]!=i:
+            parents[i]=parents[parents[i]]
+            i=parents[i]
+        return i
+    seen={}
+    for i,(tri,bid) in enumerate(glass_triangles):
+        for v in tri:
+            k=tuple(round(x,4) for x in gp[v])
+            if k in seen:parents[find(i)]=find(seen[k])
+            else:seen[k]=i
+    groups={}
+    for i,(tri,bid) in enumerate(glass_triangles):
+        g=groups.setdefault(find(i),[[],[]]);g[0].extend(tri);g[1].append(bid)
+    panes=list(groups.values())
+print("Doi Khang glass panes:",len(panes))
 hx=(hi[0]-lo[0])/2;hz=(hi[2]-lo[2])/2
 assert hx>2 and hz>2
 hx=math.ceil(hx)
@@ -98,7 +132,7 @@ bounds={"x0":-hx-1,"x1":hx+1,"z0":-hz-1,"z1":hz+1}
 assert all(isinstance(v,int) for v in bounds.values())
 assert (2*hx+2)*(2*hz+2)<250000, 'Map navigation grid too large'
 teams={t:[[sign*hx*.7,0,hz*f] for f in (-.4,-.2,0,.2,.4)] for t,sign in (("CT",-1),("T",1))}
-(dest/"map.json").write_text(json.dumps([meshes,boxes,[]],separators=(",",":")))
+(dest/"map.json").write_text(json.dumps([meshes,boxes,panes],separators=(",",":")))
 (dest/"spawn_points.json").write_text(json.dumps({"teams":teams}))
 im=Image.new("RGB",(960,540),(40,47,45))
 d=ImageDraw.Draw(im)
