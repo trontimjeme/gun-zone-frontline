@@ -1,0 +1,30 @@
+name: AZONE Pascal acceptance build
+on:
+  push:
+    branches: [feature/pascal-map-editor-integration]
+    paths:
+      - 'tools/azone-map-editor/**'
+      - '.github/workflows/azone-pascal-build.yml'
+  pull_request:
+    paths:
+      - 'tools/azone-map-editor/**'
+      - '.github/workflows/azone-pascal-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pascal-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.4'
+      - name: Validate build script syntax
+        run: sh -n tools/azone-map-editor/build-pascal.sh
+      - name: Build and smoke test pinned upstream
+        run: sh tools/azone-map-editor/build-pascal.sh "$RUNNER_TEMP/azone-pascal"
